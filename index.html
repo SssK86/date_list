@@ -28,12 +28,32 @@
       text-align: center;
     }
 
-    .form {
+    .panel,
+    .form,
+    .empty,
+    .confirm-box {
       background: #fff;
       border-radius: 16px;
-      padding: 16px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .panel,
+    .form {
+      padding: 16px;
       margin-bottom: 20px;
+    }
+
+    .panel-title {
+      margin: 0 0 12px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .panel-text {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.6;
+      margin: 0 0 12px;
     }
 
     .form-group {
@@ -52,7 +72,8 @@
     }
 
     input[type="text"],
-    input[type="url"] {
+    input[type="url"],
+    input[type="email"] {
       width: 100%;
       padding: 12px;
       border: 1px solid #d9d9d9;
@@ -66,20 +87,104 @@
       border-color: #888;
     }
 
-    .add-btn {
-      width: 100%;
-      padding: 12px;
+    .add-btn,
+    .login-btn,
+    .reload-btn,
+    .logout-btn,
+    .delete-btn,
+    .toggle-btn {
       border: none;
       border-radius: 10px;
-      font-size: 16px;
+      padding: 12px 14px;
+      font-size: 14px;
       font-weight: 700;
-      background: #222;
-      color: #fff;
       cursor: pointer;
     }
 
-    .add-btn:hover {
-      opacity: 0.92;
+    .add-btn,
+    .login-btn,
+    .toggle-btn {
+      background: #222;
+      color: #fff;
+    }
+
+    .reload-btn {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .logout-btn,
+    .delete-btn {
+      background: #e53935;
+      color: #fff;
+    }
+
+    .add-btn {
+      width: 100%;
+      font-size: 16px;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .sub-note {
+      font-size: 12px;
+      color: #666;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    .status {
+      margin-top: 10px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #444;
+      min-height: 1.4em;
+    }
+
+    .status.error {
+      color: #c62828;
+    }
+
+    .status.success {
+      color: #2e7d32;
+    }
+
+    .user-info {
+      font-size: 13px;
+      color: #555;
+      line-height: 1.6;
+      word-break: break-all;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tab-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .tab-btn.active {
+      background: #222;
+      color: #fff;
     }
 
     .list {
@@ -109,29 +214,6 @@
       word-break: break-word;
     }
 
-    .thumb {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-      border-radius: 12px;
-      background: #ececec;
-      display: block;
-      margin-bottom: 12px;
-    }
-
-    .no-image {
-      width: 100%;
-      height: 180px;
-      border-radius: 12px;
-      background: #ececec;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #666;
-      margin-bottom: 12px;
-      font-size: 14px;
-    }
-
     .url {
       display: block;
       font-size: 14px;
@@ -149,39 +231,13 @@
       display: flex;
       gap: 10px;
       justify-content: flex-end;
-    }
-
-    .open-btn,
-    .delete-btn {
-      border: none;
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .open-btn {
-      background: #222;
-      color: #fff;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .delete-btn {
-      background: #e53935;
-      color: #fff;
+      flex-wrap: wrap;
     }
 
     .empty {
       text-align: center;
       color: #666;
       padding: 28px 12px;
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
     .confirm-modal {
@@ -201,10 +257,7 @@
 
     .confirm-box {
       width: min(90vw, 340px);
-      background: #fff;
-      border-radius: 16px;
       padding: 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
       text-align: center;
     }
 
@@ -240,29 +293,22 @@
       color: #333;
     }
 
-    .sub-note {
-      font-size: 12px;
-      color: #666;
-      margin-top: 8px;
-      line-height: 1.5;
-    }
-
     @media (max-width: 480px) {
       h1 {
         font-size: 24px;
       }
 
-      .thumb,
-      .no-image {
-        height: 150px;
-      }
-
-      .actions {
+      .actions,
+      .top-actions,
+      .confirm-actions {
         flex-direction: column;
       }
 
-      .open-btn,
-      .delete-btn {
+      .delete-btn,
+      .reload-btn,
+      .logout-btn,
+      .toggle-btn,
+      .confirm-actions button {
         width: 100%;
       }
     }
@@ -272,32 +318,56 @@
   <div class="container">
     <h1>行きたいリスト</h1>
 
-    <section class="form">
-      <div class="form-group">
-        <label for="shopName">店名</label>
-        <input
-          id="shopName"
-          type="text"
-          placeholder="例：焼肉〇〇"
-        />
-      </div>
+    <section id="authPanel" class="panel">
+      <h2 class="panel-title">ログイン</h2>
+      <p class="panel-text">
+        まずは自分のアカウントでログインしてください。彼女のログイン対応は後から追加できます。
+      </p>
 
       <div class="form-group">
-        <label for="shopUrl">URL</label>
-        <input
-          id="shopUrl"
-          type="url"
-          placeholder="https://example.com"
-        />
+        <label for="emailInput">メールアドレス</label>
+        <input id="emailInput" type="email" placeholder="example@example.com" />
       </div>
 
-      <button class="add-btn" id="addBtn">追加する</button>
-      <div class="sub-note">
-        サムネ画像はURL先のOGP画像を自動取得できる場合のみ表示されます。取得できないサイトでは画像なし表示になります。
-      </div>
+      <button id="loginBtn" class="login-btn">Magic Link を送信</button>
+      <div id="authStatus" class="status"></div>
     </section>
 
-    <section id="list" class="list"></section>
+    <section id="appPanel" class="hidden">
+      <section class="panel">
+        <h2 class="panel-title">ログイン中</h2>
+        <div id="userInfo" class="user-info"></div>
+        <div class="top-actions">
+          <button id="reloadBtn" class="reload-btn">再読み込み</button>
+          <button id="logoutBtn" class="logout-btn">ログアウト</button>
+        </div>
+      </section>
+
+      <section class="form">
+        <div class="form-group">
+          <label for="shopName">店名</label>
+          <input id="shopName" type="text" placeholder="例：焼肉〇〇" />
+        </div>
+
+        <div class="form-group">
+          <label for="shopUrl">URL</label>
+          <input id="shopUrl" type="url" placeholder="https://example.com" />
+        </div>
+
+        <button class="add-btn" id="addBtn">追加する</button>
+        <div class="sub-note">
+          保存先は Supabase です。今は自動同期なしで、再読み込みすると最新内容を確認できます。
+        </div>
+        <div id="itemStatus" class="status"></div>
+      </section>
+
+      <div class="tabs">
+        <button id="tabWant" class="tab-btn active" type="button">行きたい</button>
+        <button id="tabDone" class="tab-btn" type="button">行った</button>
+      </div>
+
+      <section id="list" class="list"></section>
+    </section>
   </div>
 
   <div id="deleteConfirmModal" class="confirm-modal hidden">
@@ -310,35 +380,48 @@
     </div>
   </div>
 
-  <script>
-    const STORAGE_KEY = "date_list_items_v1";
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-    let items = loadItems();
+    const SUPABASE_URL = "https://iivycgqxkxkwtjwstgpl.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpdnljZ3F4a3hrd3Rqd3N0Z3BsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MjkzMDQsImV4cCI6MjA5MDQwNTMwNH0.Pm1G7u-7e8-6SB0xCL1CjntJyqpln5VpT-vRO-0L6pE";
+    const SHARED_LIST_ID = "d22a3c77-f232-49cd-84ee-50c5fcee3bef";
+    const REDIRECT_URL = "https://sssk86.github.io/date_list/";
+    const EXPECTED_USER_ID = "cb5a1f47-c3b6-4ce9-b14d-ab836305bab6";
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let items = [];
     let pendingDeleteId = null;
+    let currentUser = null;
+    let currentTab = "want";
+
+    const authPanelEl = document.getElementById("authPanel");
+    const appPanelEl = document.getElementById("appPanel");
+    const emailInputEl = document.getElementById("emailInput");
+    const loginBtnEl = document.getElementById("loginBtn");
+    const authStatusEl = document.getElementById("authStatus");
+
+    const userInfoEl = document.getElementById("userInfo");
+    const reloadBtnEl = document.getElementById("reloadBtn");
+    const logoutBtnEl = document.getElementById("logoutBtn");
 
     const listEl = document.getElementById("list");
     const shopNameEl = document.getElementById("shopName");
     const shopUrlEl = document.getElementById("shopUrl");
     const addBtnEl = document.getElementById("addBtn");
+    const itemStatusEl = document.getElementById("itemStatus");
+
+    const tabWantEl = document.getElementById("tabWant");
+    const tabDoneEl = document.getElementById("tabDone");
 
     const deleteConfirmModalEl = document.getElementById("deleteConfirmModal");
     const confirmDeleteYesEl = document.getElementById("confirmDeleteYes");
     const confirmDeleteNoEl = document.getElementById("confirmDeleteNo");
 
-    function loadItems() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return [];
-        const parsed = JSON.parse(raw);
-        return Array.isArray(parsed) ? parsed : [];
-      } catch (error) {
-        console.error("load error:", error);
-        return [];
-      }
-    }
-
-    function saveItems() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    function setStatus(el, message, type = "") {
+      el.textContent = message || "";
+      el.className = "status" + (type ? " " + type : "");
     }
 
     function escapeHtml(str) {
@@ -351,52 +434,209 @@
     }
 
     function normalizeUrl(url) {
-      const trimmed = url.trim();
+      const trimmed = String(url || "").trim();
       if (!trimmed) return "";
       if (/^https?:\/\//i.test(trimmed)) return trimmed;
       return "https://" + trimmed;
     }
 
-    function getOgImageUrl(pageUrl) {
-      return "https://images.weserv.nl/?url=" + encodeURIComponent("image.thum.io/get/" + pageUrl) + "&w=800&h=450&fit=cover";
+    function updateTabs() {
+      tabWantEl.classList.toggle("active", currentTab === "want");
+      tabDoneEl.classList.toggle("active", currentTab === "done");
     }
 
-    function addItem() {
+    function showLoggedOut() {
+      authPanelEl.classList.remove("hidden");
+      appPanelEl.classList.add("hidden");
+      userInfoEl.textContent = "";
+      currentUser = null;
+      items = [];
+      renderItems();
+    }
+
+    function showLoggedIn(user) {
+      authPanelEl.classList.add("hidden");
+      appPanelEl.classList.remove("hidden");
+      currentUser = user;
+      userInfoEl.innerHTML = `
+        <div>メール: ${escapeHtml(user.email || "")}</div>
+        <div>ユーザーID: ${escapeHtml(user.id || "")}</div>
+        <div>共有リストID: ${escapeHtml(SHARED_LIST_ID)}</div>
+      `;
+    }
+
+    async function sendMagicLink() {
+      const email = emailInputEl.value.trim();
+
+      if (!email) {
+        setStatus(authStatusEl, "メールアドレスを入力してください。", "error");
+        return;
+      }
+
+      loginBtnEl.disabled = true;
+      setStatus(authStatusEl, "送信中...", "");
+
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: REDIRECT_URL
+        }
+      });
+
+      loginBtnEl.disabled = false;
+
+      if (error) {
+        setStatus(authStatusEl, "送信に失敗しました: " + error.message, "error");
+        return;
+      }
+
+      setStatus(authStatusEl, "Magic Link を送信しました。メールを確認してください。", "success");
+    }
+
+    async function loadSessionAndItems() {
+      setStatus(authStatusEl, "");
+      setStatus(itemStatusEl, "");
+
+      const {
+        data: { session },
+        error: sessionError
+      } = await supabase.auth.getSession();
+
+      if (sessionError) {
+        showLoggedOut();
+        setStatus(authStatusEl, "セッション確認に失敗しました: " + sessionError.message, "error");
+        return;
+      }
+
+      if (!session || !session.user) {
+        showLoggedOut();
+        return;
+      }
+
+      if (session.user.id !== EXPECTED_USER_ID) {
+        showLoggedOut();
+        setStatus(authStatusEl, "この画面は現在、指定したユーザーIDのみ利用できます。", "error");
+        return;
+      }
+
+      showLoggedIn(session.user);
+      await verifyMembershipAndLoadItems();
+    }
+
+    async function verifyMembershipAndLoadItems() {
+      const { data: membership, error: membershipError } = await supabase
+        .from("list_members")
+        .select("id, list_id, user_id, role")
+        .eq("list_id", SHARED_LIST_ID)
+        .eq("user_id", EXPECTED_USER_ID)
+        .maybeSingle();
+
+      if (membershipError) {
+        items = [];
+        renderItems();
+        setStatus(itemStatusEl, "list_members の確認に失敗しました: " + membershipError.message, "error");
+        return;
+      }
+
+      if (!membership) {
+        items = [];
+        renderItems();
+        setStatus(itemStatusEl, "このユーザーは共有リストのメンバーではありません。", "error");
+        return;
+      }
+
+      await loadItems();
+    }
+
+    async function loadItems() {
+      setStatus(itemStatusEl, "読み込み中...", "");
+
+      const { data, error } = await supabase
+        .from("items")
+        .select("id, name, url, visited, created_at")
+        .eq("list_id", SHARED_LIST_ID)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        items = [];
+        renderItems();
+        setStatus(itemStatusEl, "読み込みに失敗しました: " + error.message, "error");
+        return;
+      }
+
+      items = Array.isArray(data) ? data : [];
+      renderItems();
+      setStatus(itemStatusEl, "", "");
+    }
+
+    async function addItem() {
       const name = shopNameEl.value.trim();
       const url = normalizeUrl(shopUrlEl.value);
 
+      if (!currentUser) {
+        setStatus(itemStatusEl, "先にログインしてください。", "error");
+        return;
+      }
+
       if (!name) {
-        alert("店名を入力してください。");
+        setStatus(itemStatusEl, "店名を入力してください。", "error");
         return;
       }
 
       if (!url) {
-        alert("URLを入力してください。");
+        setStatus(itemStatusEl, "URLを入力してください。", "error");
         return;
       }
 
       try {
         new URL(url);
       } catch {
-        alert("URLの形式が正しくありません。");
+        setStatus(itemStatusEl, "URLの形式が正しくありません。", "error");
         return;
       }
 
-      const item = {
-        id: Date.now(),
+      addBtnEl.disabled = true;
+      setStatus(itemStatusEl, "保存中...", "");
+
+      const { error } = await supabase.from("items").insert({
+        list_id: SHARED_LIST_ID,
         name,
         url,
-        image: getOgImageUrl(url),
-        createdAt: new Date().toISOString()
-      };
+        visited: false,
+        created_by: currentUser.id
+      });
 
-      items.unshift(item);
-      saveItems();
-      renderItems();
+      addBtnEl.disabled = false;
+
+      if (error) {
+        setStatus(itemStatusEl, "保存に失敗しました: " + error.message, "error");
+        return;
+      }
 
       shopNameEl.value = "";
       shopUrlEl.value = "";
       shopNameEl.focus();
+
+      setStatus(itemStatusEl, "保存しました。", "success");
+      await loadItems();
+    }
+
+    async function toggleVisited(id, nextVisited) {
+      setStatus(itemStatusEl, "更新中...", "");
+
+      const { error } = await supabase
+        .from("items")
+        .update({ visited: nextVisited })
+        .eq("id", id)
+        .eq("list_id", SHARED_LIST_ID);
+
+      if (error) {
+        setStatus(itemStatusEl, "更新に失敗しました: " + error.message, "error");
+        return;
+      }
+
+      setStatus(itemStatusEl, "更新しました。", "success");
+      await loadItems();
     }
 
     function openDeleteConfirm(id) {
@@ -409,26 +649,42 @@
       deleteConfirmModalEl.classList.add("hidden");
     }
 
-    function deleteItem(id) {
-      items = items.filter(item => item.id !== id);
-      saveItems();
-      renderItems();
+    async function deleteItem(id) {
+      setStatus(itemStatusEl, "削除中...", "");
+
+      const { error } = await supabase
+        .from("items")
+        .delete()
+        .eq("id", id)
+        .eq("list_id", SHARED_LIST_ID);
+
+      if (error) {
+        setStatus(itemStatusEl, "削除に失敗しました: " + error.message, "error");
+        return;
+      }
+
+      setStatus(itemStatusEl, "削除しました。", "success");
+      await loadItems();
     }
 
     function renderItems() {
-      if (items.length === 0) {
+      const filteredItems = items.filter(item => {
+        return currentTab === "want" ? !item.visited : item.visited;
+      });
+
+      if (filteredItems.length === 0) {
         listEl.innerHTML = `
           <div class="empty">
-            まだお店が登録されていません。
+            ${currentTab === "want" ? "まだ行きたいお店が登録されていません。" : "まだ行ったお店がありません。"}
           </div>
         `;
         return;
       }
 
-      listEl.innerHTML = items.map(item => {
+      listEl.innerHTML = filteredItems.map(item => {
         const safeName = escapeHtml(item.name);
         const safeUrl = escapeHtml(item.url);
-        const safeImage = escapeHtml(item.image || "");
+        const safeId = escapeHtml(item.id);
 
         return `
           <article class="card">
@@ -436,31 +692,28 @@
               <h2 class="card-title">${safeName}</h2>
             </div>
 
-            ${
-              safeImage
-                ? `<img
-                    class="thumb"
-                    src="${safeImage}"
-                    alt="${safeName}"
-                    loading="lazy"
-                    referrerpolicy="no-referrer"
-                    onerror="this.outerHTML='<div class=&quot;no-image&quot;>画像を取得できませんでした</div>';"
-                  >`
-                : `<div class="no-image">画像なし</div>`
-            }
-
             <a class="url" href="${safeUrl}" target="_blank" rel="noopener noreferrer">
               ${safeUrl}
             </a>
 
             <div class="actions">
-              <a class="open-btn" href="${safeUrl}" target="_blank" rel="noopener noreferrer">開く</a>
-              <button class="delete-btn" onclick="openDeleteConfirm(${item.id})">削除</button>
+              <button class="toggle-btn" data-toggle-id="${safeId}" data-next-visited="${item.visited ? "false" : "true"}">
+                ${item.visited ? "行きたいに戻す" : "行った"}
+              </button>
+              <button class="delete-btn" data-delete-id="${safeId}">削除</button>
             </div>
           </article>
         `;
       }).join("");
     }
+
+    loginBtnEl.addEventListener("click", sendMagicLink);
+
+    emailInputEl.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        sendMagicLink();
+      }
+    });
 
     addBtnEl.addEventListener("click", addItem);
 
@@ -476,9 +729,53 @@
       }
     });
 
-    confirmDeleteYesEl.addEventListener("click", () => {
+    reloadBtnEl.addEventListener("click", async () => {
+      await loadItems();
+    });
+
+    logoutBtnEl.addEventListener("click", async () => {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        setStatus(itemStatusEl, "ログアウトに失敗しました: " + error.message, "error");
+        return;
+      }
+
+      showLoggedOut();
+      setStatus(authStatusEl, "ログアウトしました。", "success");
+    });
+
+    tabWantEl.addEventListener("click", () => {
+      currentTab = "want";
+      updateTabs();
+      renderItems();
+    });
+
+    tabDoneEl.addEventListener("click", () => {
+      currentTab = "done";
+      updateTabs();
+      renderItems();
+    });
+
+    listEl.addEventListener("click", async (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+
+      const deleteId = target.getAttribute("data-delete-id");
+      if (deleteId) {
+        openDeleteConfirm(deleteId);
+        return;
+      }
+
+      const toggleId = target.getAttribute("data-toggle-id");
+      const nextVisited = target.getAttribute("data-next-visited");
+      if (toggleId && nextVisited !== null) {
+        await toggleVisited(toggleId, nextVisited === "true");
+      }
+    });
+
+    confirmDeleteYesEl.addEventListener("click", async () => {
       if (pendingDeleteId !== null) {
-        deleteItem(pendingDeleteId);
+        await deleteItem(pendingDeleteId);
       }
       closeDeleteConfirm();
     });
@@ -493,9 +790,22 @@
       }
     });
 
-    renderItems();
+    updateTabs();
+    await loadSessionAndItems();
 
-    window.openDeleteConfirm = openDeleteConfirm;
+    supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session && session.user) {
+        if (session.user.id !== EXPECTED_USER_ID) {
+          showLoggedOut();
+          setStatus(authStatusEl, "この画面は現在、指定したユーザーIDのみ利用できます。", "error");
+          return;
+        }
+        showLoggedIn(session.user);
+        await verifyMembershipAndLoadItems();
+      } else {
+        showLoggedOut();
+      }
+    });
   </script>
 </body>
 </html>
