@@ -49,6 +49,92 @@
       font-weight: 700;
     }
 
+    .header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .header-bar h1 {
+      margin: 0;
+      text-align: left;
+      flex: 1;
+    }
+
+    .account-menu {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .account-btn {
+      border: none;
+      background: #fff;
+      color: #222;
+      border-radius: 999px;
+      padding: 10px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      max-width: 180px;
+    }
+
+    .account-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #9ca3af;
+      flex-shrink: 0;
+    }
+
+    .account-dot.logged-in {
+      background: #16a34a;
+    }
+
+    .account-label {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .account-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: min(300px, 80vw);
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+      padding: 14px;
+      z-index: 1000;
+    }
+
+    .account-dropdown.hidden {
+      display: none;
+    }
+
+    .account-email {
+      font-size: 13px;
+      color: #555;
+      line-height: 1.5;
+      word-break: break-all;
+      margin-bottom: 12px;
+    }
+
+    .account-actions {
+      display: grid;
+      gap: 8px;
+    }
+
+    .account-actions button {
+      width: 100%;
+    }
+
     .panel-text {
       font-size: 14px;
       color: #555;
@@ -298,6 +384,15 @@
         font-size: 24px;
       }
 
+      .header-bar {
+        align-items: flex-start;
+      }
+
+      .account-btn {
+        max-width: 120px;
+        padding: 9px 10px;
+      }
+
       .actions,
       .top-actions,
       .confirm-actions {
@@ -316,7 +411,22 @@
 </head>
 <body>
   <div class="container">
-    <h1>行きたいリスト</h1>
+    <div class="header-bar">
+      <h1>行きたいリスト</h1>
+      <div class="account-menu">
+        <button id="accountBtn" class="account-btn" type="button" aria-label="アカウントメニュー">
+          <span id="accountDot" class="account-dot"></span>
+          <span id="accountLabel" class="account-label">未ログイン</span>
+        </button>
+        <div id="accountDropdown" class="account-dropdown hidden">
+          <div id="accountEmail" class="account-email">ログインしていません</div>
+          <div class="account-actions">
+            <button id="reloadBtn" class="reload-btn" type="button">再読み込み</button>
+            <button id="logoutBtn" class="logout-btn" type="button">ログアウト</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <section id="authPanel" class="panel">
       <h2 class="panel-title">ログイン</h2>
@@ -334,15 +444,6 @@
     </section>
 
     <section id="appPanel" class="hidden">
-      <section class="panel">
-        <h2 class="panel-title">ログイン中</h2>
-        <div id="userInfo" class="user-info"></div>
-        <div class="top-actions">
-          <button id="reloadBtn" class="reload-btn">再読み込み</button>
-          <button id="logoutBtn" class="logout-btn">ログアウト</button>
-        </div>
-      </section>
-
       <section class="form">
         <div class="form-group">
           <label for="shopName">店名</label>
@@ -384,7 +485,7 @@
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
     const SUPABASE_URL = "https://iivycgqxkxkwtjwstgpl.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpdnljZ3F4a3hrd3Rqd3N0Z3BsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MjkzMDQsImV4cCI6MjA5MDQwNTMwNH0.Pm1G7u-7e8-6SB0xCL1CjntJyqpln5VpT-vRO-0L6pE";
+    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
     const SHARED_LIST_ID = "d22a3c77-f232-49cd-84ee-50c5fcee3bef";
     const REDIRECT_URL = "https://sssk86.github.io/date_list/";
     const EXPECTED_USER_ID = "cb5a1f47-c3b6-4ce9-b14d-ab836305bab6";
@@ -402,7 +503,11 @@
     const loginBtnEl = document.getElementById("loginBtn");
     const authStatusEl = document.getElementById("authStatus");
 
-    const userInfoEl = document.getElementById("userInfo");
+    const accountBtnEl = document.getElementById("accountBtn");
+    const accountDotEl = document.getElementById("accountDot");
+    const accountLabelEl = document.getElementById("accountLabel");
+    const accountDropdownEl = document.getElementById("accountDropdown");
+    const accountEmailEl = document.getElementById("accountEmail");
     const reloadBtnEl = document.getElementById("reloadBtn");
     const logoutBtnEl = document.getElementById("logoutBtn");
 
@@ -445,12 +550,34 @@
       tabDoneEl.classList.toggle("active", currentTab === "done");
     }
 
+    function closeAccountDropdown() {
+      accountDropdownEl.classList.add("hidden");
+    }
+
+    function updateAccountUi() {
+      if (currentUser) {
+        accountDotEl.classList.add("logged-in");
+        accountLabelEl.textContent = currentUser.email || "ログイン中";
+        accountEmailEl.textContent = (currentUser.email || "") + "
+ユーザーID: " + (currentUser.id || "");
+        reloadBtnEl.disabled = false;
+        logoutBtnEl.disabled = false;
+      } else {
+        accountDotEl.classList.remove("logged-in");
+        accountLabelEl.textContent = "未ログイン";
+        accountEmailEl.textContent = "ログインしていません";
+        reloadBtnEl.disabled = true;
+        logoutBtnEl.disabled = true;
+      }
+    }
+
     function showLoggedOut() {
       authPanelEl.classList.remove("hidden");
       appPanelEl.classList.add("hidden");
-      userInfoEl.textContent = "";
       currentUser = null;
       items = [];
+      updateAccountUi();
+      closeAccountDropdown();
       renderItems();
     }
 
@@ -458,11 +585,7 @@
       authPanelEl.classList.add("hidden");
       appPanelEl.classList.remove("hidden");
       currentUser = user;
-      userInfoEl.innerHTML = `
-        <div>メール: ${escapeHtml(user.email || "")}</div>
-        <div>ユーザーID: ${escapeHtml(user.id || "")}</div>
-        <div>共有リストID: ${escapeHtml(SHARED_LIST_ID)}</div>
-      `;
+      updateAccountUi();
     }
 
     async function sendMagicLink() {
@@ -707,6 +830,16 @@
       }).join("");
     }
 
+    accountBtnEl.addEventListener("click", () => {
+      accountDropdownEl.classList.toggle("hidden");
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!accountBtnEl.contains(event.target) && !accountDropdownEl.contains(event.target)) {
+        closeAccountDropdown();
+      }
+    });
+
     loginBtnEl.addEventListener("click", sendMagicLink);
 
     emailInputEl.addEventListener("keydown", (event) => {
@@ -791,6 +924,7 @@
     });
 
     updateTabs();
+    updateAccountUi();
     await loadSessionAndItems();
 
     supabase.auth.onAuthStateChange(async (_event, session) => {
