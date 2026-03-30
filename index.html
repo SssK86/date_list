@@ -5,397 +5,497 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>行きたいリスト</title>
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f5f7fb;
-      color: #1f2937;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif;
+      background: #f7f7f7;
+      color: #222;
     }
-    .app {
+
+    .container {
       max-width: 720px;
       margin: 0 auto;
-      padding: 16px 16px 96px;
+      padding: 20px 16px 40px;
     }
+
     h1 {
-      margin: 0 0 16px;
-      font-size: 24px;
+      margin: 0 0 20px;
+      font-size: 28px;
+      text-align: center;
     }
-    .tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-    .tab {
-      border: none;
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: #e5e7eb;
-      color: #111827;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    .tab.active {
-      background: #111827;
-      color: #ffffff;
-    }
-    .panel, .card {
-      background: #ffffff;
+
+    .form {
+      background: #fff;
       border-radius: 16px;
-      padding: 14px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+      padding: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      margin-bottom: 20px;
     }
-    .panel {
-      margin-bottom: 16px;
+
+    .form-group {
+      margin-bottom: 12px;
     }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
     label {
       display: block;
-      margin-bottom: 8px;
       font-size: 14px;
       font-weight: 600;
+      margin-bottom: 6px;
     }
+
     input[type="text"],
     input[type="url"] {
       width: 100%;
       padding: 12px;
-      border: 1px solid #d1d5db;
-      border-radius: 12px;
-      font-size: 14px;
-      margin-bottom: 12px;
-      background: #ffffff;
-      color: #111827;
+      border: 1px solid #d9d9d9;
+      border-radius: 10px;
+      font-size: 16px;
+      background: #fff;
     }
-    .actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+
+    input:focus {
+      outline: none;
+      border-color: #888;
     }
-    button {
+
+    .add-btn {
+      width: 100%;
+      padding: 12px;
       border: none;
-      border-radius: 12px;
-      padding: 10px 14px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .primary {
-      background: #111827;
-      color: #ffffff;
-    }
-    .secondary {
-      background: #e5e7eb;
-      color: #111827;
-    }
-    .danger {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-    .list {
-      display: grid;
-      gap: 12px;
-    }
-    .card-title {
+      border-radius: 10px;
       font-size: 16px;
       font-weight: 700;
-      margin-bottom: 6px;
+      background: #222;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .add-btn:hover {
+      opacity: 0.92;
+    }
+
+    .list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.4;
       word-break: break-word;
     }
-    .card-domain {
-      font-size: 13px;
-      color: #6b7280;
-      margin-bottom: 8px;
-    }
-    .card-link {
-      display: inline-block;
+
+    .thumb {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 12px;
+      background: #ececec;
+      display: block;
       margin-bottom: 12px;
+    }
+
+    .no-image {
+      width: 100%;
+      height: 180px;
+      border-radius: 12px;
+      background: #ececec;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+
+    .url {
+      display: block;
+      font-size: 14px;
       color: #2563eb;
       text-decoration: none;
       word-break: break-all;
-      font-size: 13px;
+      margin-bottom: 12px;
     }
+
+    .url:hover {
+      text-decoration: underline;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .open-btn,
+    .delete-btn {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .open-btn {
+      background: #222;
+      color: #fff;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .delete-btn {
+      background: #e53935;
+      color: #fff;
+    }
+
     .empty {
       text-align: center;
-      color: #6b7280;
-      padding: 32px 16px;
-      background: #ffffff;
+      color: #666;
+      padding: 28px 12px;
+      background: #fff;
       border-radius: 16px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
-    .floating-add {
+
+    .confirm-modal {
       position: fixed;
-      right: 16px;
-      bottom: 16px;
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: #111827;
-      color: #ffffff;
-      font-size: 28px;
-      line-height: 1;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 16px;
     }
-    .hidden {
+
+    .confirm-modal.hidden {
       display: none;
     }
-    .status {
-      font-size: 13px;
-      color: #b91c1c;
-      margin-bottom: 12px;
-      min-height: 1.2em;
+
+    .confirm-box {
+      width: min(90vw, 340px);
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+
+    .confirm-text {
+      margin: 0 0 16px;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .confirm-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .confirm-actions button {
+      min-width: 96px;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .danger-btn {
+      background: #e53935;
+      color: #fff;
+    }
+
+    .secondary-btn {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .sub-note {
+      font-size: 12px;
+      color: #666;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 24px;
+      }
+
+      .thumb,
+      .no-image {
+        height: 150px;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .open-btn,
+      .delete-btn {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="app">
+  <div class="container">
     <h1>行きたいリスト</h1>
 
-    <div class="tabs">
-      <button id="tabWant" class="tab active" type="button">行きたい</button>
-      <button id="tabDone" class="tab" type="button">行った</button>
-    </div>
+    <section class="form">
+      <div class="form-group">
+        <label for="shopName">店名</label>
+        <input
+          id="shopName"
+          type="text"
+          placeholder="例：焼肉〇〇"
+        />
+      </div>
 
-    <section id="addPanel" class="panel hidden">
-      <label for="nameInput">店名</label>
-      <input id="nameInput" type="text" placeholder="店名を入力" />
+      <div class="form-group">
+        <label for="shopUrl">URL</label>
+        <input
+          id="shopUrl"
+          type="url"
+          placeholder="https://example.com"
+        />
+      </div>
 
-      <label for="urlInput">URL</label>
-      <input id="urlInput" type="url" placeholder="お店やスポットのURLを貼り付け" />
-
-      <div id="status" class="status"></div>
-
-      <div class="actions">
-        <button id="saveBtn" class="primary" type="button">保存</button>
-        <button id="closeBtn" class="secondary" type="button">閉じる</button>
+      <button class="add-btn" id="addBtn">追加する</button>
+      <div class="sub-note">
+        サムネ画像はURL先のOGP画像を自動取得できる場合のみ表示されます。取得できないサイトでは画像なし表示になります。
       </div>
     </section>
 
     <section id="list" class="list"></section>
   </div>
 
-  <button id="openBtn" class="floating-add" type="button" aria-label="行きたいを追加">＋</button>
+  <div id="deleteConfirmModal" class="confirm-modal hidden">
+    <div class="confirm-box">
+      <p class="confirm-text">このお店を削除していいですか？</p>
+      <div class="confirm-actions">
+        <button id="confirmDeleteYes" class="danger-btn">はい</button>
+        <button id="confirmDeleteNo" class="secondary-btn">いいえ</button>
+      </div>
+    </div>
+  </div>
 
   <script>
-    (function () {
-      var STORAGE_KEY = 'date_spots_manual_v1';
-      var currentTab = 'want';
-      var items = loadItems();
+    const STORAGE_KEY = "date_list_items_v1";
 
-      var listEl = document.getElementById('list');
-      var addPanelEl = document.getElementById('addPanel');
-      var nameInputEl = document.getElementById('nameInput');
-      var urlInputEl = document.getElementById('urlInput');
-      var statusEl = document.getElementById('status');
-      var saveBtnEl = document.getElementById('saveBtn');
-      var closeBtnEl = document.getElementById('closeBtn');
-      var openBtnEl = document.getElementById('openBtn');
-      var tabWantEl = document.getElementById('tabWant');
-      var tabDoneEl = document.getElementById('tabDone');
+    let items = loadItems();
+    let pendingDeleteId = null;
 
-      tabWantEl.addEventListener('click', function () {
-        currentTab = 'want';
-        updateTabs();
-        render();
-      });
+    const listEl = document.getElementById("list");
+    const shopNameEl = document.getElementById("shopName");
+    const shopUrlEl = document.getElementById("shopUrl");
+    const addBtnEl = document.getElementById("addBtn");
 
-      tabDoneEl.addEventListener('click', function () {
-        currentTab = 'done';
-        updateTabs();
-        render();
-      });
+    const deleteConfirmModalEl = document.getElementById("deleteConfirmModal");
+    const confirmDeleteYesEl = document.getElementById("confirmDeleteYes");
+    const confirmDeleteNoEl = document.getElementById("confirmDeleteNo");
 
-      openBtnEl.addEventListener('click', openPanel);
-      closeBtnEl.addEventListener('click', closePanel);
-      saveBtnEl.addEventListener('click', addItem);
+    function loadItems() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (error) {
+        console.error("load error:", error);
+        return [];
+      }
+    }
 
-      nameInputEl.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter') {
-          event.preventDefault();
-          addItem();
-        }
-      });
+    function saveItems() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    }
 
-      urlInputEl.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter') {
-          event.preventDefault();
-          addItem();
-        }
-      });
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
 
-      function updateTabs() {
-        tabWantEl.classList.toggle('active', currentTab === 'want');
-        tabDoneEl.classList.toggle('active', currentTab === 'done');
+    function normalizeUrl(url) {
+      const trimmed = url.trim();
+      if (!trimmed) return "";
+      if (/^https?:\/\//i.test(trimmed)) return trimmed;
+      return "https://" + trimmed;
+    }
+
+    function getOgImageUrl(pageUrl) {
+      return "https://images.weserv.nl/?url=" + encodeURIComponent("image.thum.io/get/" + pageUrl) + "&w=800&h=450&fit=cover";
+    }
+
+    function addItem() {
+      const name = shopNameEl.value.trim();
+      const url = normalizeUrl(shopUrlEl.value);
+
+      if (!name) {
+        alert("店名を入力してください。");
+        return;
       }
 
-      function loadItems() {
-        try {
-          var raw = localStorage.getItem(STORAGE_KEY);
-          if (!raw) return [];
-          var parsed = JSON.parse(raw);
-          return Array.isArray(parsed) ? parsed : [];
-        } catch (error) {
-          return [];
-        }
+      if (!url) {
+        alert("URLを入力してください。");
+        return;
       }
 
-      function saveItems() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      try {
+        new URL(url);
+      } catch {
+        alert("URLの形式が正しくありません。");
+        return;
       }
 
-      function openPanel() {
-        addPanelEl.classList.remove('hidden');
-        statusEl.textContent = '';
-        nameInputEl.focus();
+      const item = {
+        id: Date.now(),
+        name,
+        url,
+        image: getOgImageUrl(url),
+        createdAt: new Date().toISOString()
+      };
+
+      items.unshift(item);
+      saveItems();
+      renderItems();
+
+      shopNameEl.value = "";
+      shopUrlEl.value = "";
+      shopNameEl.focus();
+    }
+
+    function openDeleteConfirm(id) {
+      pendingDeleteId = id;
+      deleteConfirmModalEl.classList.remove("hidden");
+    }
+
+    function closeDeleteConfirm() {
+      pendingDeleteId = null;
+      deleteConfirmModalEl.classList.add("hidden");
+    }
+
+    function deleteItem(id) {
+      items = items.filter(item => item.id !== id);
+      saveItems();
+      renderItems();
+    }
+
+    function renderItems() {
+      if (items.length === 0) {
+        listEl.innerHTML = `
+          <div class="empty">
+            まだお店が登録されていません。
+          </div>
+        `;
+        return;
       }
 
-      function closePanel() {
-        addPanelEl.classList.add('hidden');
-        statusEl.textContent = '';
-        nameInputEl.value = '';
-        urlInputEl.value = '';
+      listEl.innerHTML = items.map(item => {
+        const safeName = escapeHtml(item.name);
+        const safeUrl = escapeHtml(item.url);
+        const safeImage = escapeHtml(item.image || "");
+
+        return `
+          <article class="card">
+            <div class="card-header">
+              <h2 class="card-title">${safeName}</h2>
+            </div>
+
+            ${
+              safeImage
+                ? `<img
+                    class="thumb"
+                    src="${safeImage}"
+                    alt="${safeName}"
+                    loading="lazy"
+                    referrerpolicy="no-referrer"
+                    onerror="this.outerHTML='<div class=&quot;no-image&quot;>画像を取得できませんでした</div>';"
+                  >`
+                : `<div class="no-image">画像なし</div>`
+            }
+
+            <a class="url" href="${safeUrl}" target="_blank" rel="noopener noreferrer">
+              ${safeUrl}
+            </a>
+
+            <div class="actions">
+              <a class="open-btn" href="${safeUrl}" target="_blank" rel="noopener noreferrer">開く</a>
+              <button class="delete-btn" onclick="openDeleteConfirm(${item.id})">削除</button>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    addBtnEl.addEventListener("click", addItem);
+
+    shopNameEl.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        addItem();
       }
+    });
 
-      function normalizeUrl(value) {
-        var trimmed = String(value || '').trim();
-        if (!trimmed) return '';
-        if (/^https?:\/\//i.test(trimmed)) return trimmed;
-        return 'https://' + trimmed;
+    shopUrlEl.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        addItem();
       }
+    });
 
-      function parseUrl(url) {
-        try {
-          return new URL(url);
-        } catch (error) {
-          return null;
-        }
+    confirmDeleteYesEl.addEventListener("click", () => {
+      if (pendingDeleteId !== null) {
+        deleteItem(pendingDeleteId);
       }
+      closeDeleteConfirm();
+    });
 
-      function getDomain(url) {
-        var parsed = parseUrl(url);
-        if (!parsed) return '';
-        return parsed.hostname.replace(/^www\./, '');
+    confirmDeleteNoEl.addEventListener("click", () => {
+      closeDeleteConfirm();
+    });
+
+    deleteConfirmModalEl.addEventListener("click", (event) => {
+      if (event.target === deleteConfirmModalEl) {
+        closeDeleteConfirm();
       }
+    });
 
-      function createId() {
-        return 'id_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
-      }
+    renderItems();
 
-      function isDuplicate(url, name) {
-        return items.some(function (item) {
-          return item.url === url && item.name === name;
-        });
-      }
-
-      function addItem() {
-        var name = String(nameInputEl.value || '').trim();
-        var url = normalizeUrl(urlInputEl.value);
-
-        if (!name) {
-          statusEl.textContent = '店名を入力してください';
-          return;
-        }
-
-        if (!url) {
-          statusEl.textContent = 'URLを入力してください';
-          return;
-        }
-
-        if (!parseUrl(url)) {
-          statusEl.textContent = '正しいURLを入力してください';
-          return;
-        }
-
-        if (isDuplicate(url, name)) {
-          statusEl.textContent = '同じ店名とURLはすでに登録されています';
-          return;
-        }
-
-        items.unshift({
-          id: createId(),
-          name: name,
-          url: url,
-          domain: getDomain(url),
-          visited: false,
-          createdAt: Date.now()
-        });
-
-        saveItems();
-        render();
-        closePanel();
-      }
-
-      function toggleVisited(id) {
-        items = items.map(function (item) {
-          if (item.id === id) {
-            item.visited = !item.visited;
-          }
-          return item;
-        });
-        saveItems();
-        render();
-      }
-
-      function removeItem(id) {
-        items = items.filter(function (item) {
-          return item.id !== id;
-        });
-        saveItems();
-        render();
-      }
-
-      function escapeHtml(value) {
-        return String(value)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;')
-          .replace(/'/g, '&#039;');
-      }
-
-      function render() {
-        var filtered = items.filter(function (item) {
-          return currentTab === 'want' ? !item.visited : item.visited;
-        });
-
-        if (!filtered.length) {
-          listEl.innerHTML = '<div class="empty">' +
-            (currentTab === 'want' ? 'まだ行きたい場所がありません' : 'まだ行った場所がありません') +
-            '</div>';
-          return;
-        }
-
-        var html = filtered.map(function (item) {
-          return '' +
-            '<article class="card">' +
-              '<div class="card-title">' + escapeHtml(item.name) + '</div>' +
-              '<div class="card-domain">' + escapeHtml(item.domain || 'URL保存') + '</div>' +
-              '<a class="card-link" href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(item.url) + '</a>' +
-              '<div class="actions">' +
-                '<button class="primary" type="button" data-action="toggle" data-id="' + escapeHtml(item.id) + '">' + (item.visited ? '行きたいに戻す' : '行った') + '</button>' +
-                '<button class="danger" type="button" data-action="delete" data-id="' + escapeHtml(item.id) + '">削除</button>' +
-              '</div>' +
-            '</article>';
-        }).join('');
-
-        listEl.innerHTML = html;
-      }
-
-      listEl.addEventListener('click', function (event) {
-        var target = event.target;
-        if (!(target instanceof HTMLElement)) return;
-
-        var action = target.getAttribute('data-action');
-        var id = target.getAttribute('data-id');
-        if (!action || !id) return;
-
-        if (action === 'toggle') {
-          toggleVisited(id);
-        } else if (action === 'delete') {
-          removeItem(id);
-        }
-      });
-
-      updateTabs();
-      render();
-    })();
+    window.openDeleteConfirm = openDeleteConfirm;
   </script>
 </body>
 </html>
