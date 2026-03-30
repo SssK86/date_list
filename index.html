@@ -9,11 +9,11 @@
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f6f7fb;
-      color: #222;
+      background: #f5f7fb;
+      color: #1f2937;
     }
     .app {
-      max-width: 680px;
+      max-width: 720px;
       margin: 0 auto;
       padding: 16px 16px 96px;
     }
@@ -31,26 +31,27 @@
       padding: 10px 14px;
       border-radius: 999px;
       background: #e5e7eb;
+      color: #111827;
       cursor: pointer;
       font-size: 14px;
     }
     .tab.active {
       background: #111827;
-      color: #fff;
+      color: #ffffff;
     }
-    .form-card, .card {
-      background: #fff;
+    .panel, .card {
+      background: #ffffff;
       border-radius: 16px;
       padding: 14px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
     }
-    .form-card {
+    .panel {
       margin-bottom: 16px;
     }
     label {
       display: block;
-      font-size: 14px;
       margin-bottom: 8px;
+      font-size: 14px;
       font-weight: 600;
     }
     input[type="url"] {
@@ -59,6 +60,13 @@
       border: 1px solid #d1d5db;
       border-radius: 12px;
       font-size: 14px;
+      margin-bottom: 10px;
+      background: #ffffff;
+      color: #111827;
+    }
+    .hint {
+      font-size: 12px;
+      color: #6b7280;
       margin-bottom: 12px;
     }
     .actions {
@@ -70,16 +78,20 @@
       border: none;
       border-radius: 12px;
       padding: 10px 14px;
-      cursor: pointer;
       font-size: 14px;
+      cursor: pointer;
     }
     .primary {
       background: #111827;
-      color: white;
+      color: #ffffff;
     }
     .secondary {
       background: #e5e7eb;
       color: #111827;
+    }
+    .danger {
+      background: #fee2e2;
+      color: #991b1b;
     }
     .list {
       display: grid;
@@ -94,20 +106,23 @@
     .card-domain {
       font-size: 13px;
       color: #6b7280;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
-    .card a {
+    .card-link {
+      display: inline-block;
+      margin-bottom: 12px;
       color: #2563eb;
       text-decoration: none;
       word-break: break-all;
       font-size: 13px;
-      display: inline-block;
-      margin-bottom: 12px;
     }
     .empty {
       text-align: center;
       color: #6b7280;
       padding: 32px 16px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
     }
     .floating-add {
       position: fixed;
@@ -117,18 +132,19 @@
       height: 56px;
       border-radius: 50%;
       background: #111827;
-      color: #fff;
+      color: #ffffff;
       font-size: 28px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.18);
-    }
-    .hint {
-      font-size: 12px;
-      color: #6b7280;
-      margin-top: -6px;
-      margin-bottom: 12px;
+      line-height: 1;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
     }
     .hidden {
       display: none;
+    }
+    .status {
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 12px;
+      min-height: 1.2em;
     }
   </style>
 </head>
@@ -137,212 +153,297 @@
     <h1>ふたりで行きたい</h1>
 
     <div class="tabs">
-      <button class="tab active" data-tab="want">行きたい</button>
-      <button class="tab" data-tab="done">行った</button>
+      <button id="tabWant" class="tab active" type="button">行きたい</button>
+      <button id="tabDone" class="tab" type="button">行った</button>
     </div>
 
-    <section id="addForm" class="form-card hidden">
+    <section id="addPanel" class="panel hidden">
       <label for="urlInput">URL</label>
       <input id="urlInput" type="url" placeholder="お店やスポットのURLを貼り付け" />
-      <div class="hint">URLからタイトルを自動補助入力します</div>
+      <div class="hint">URLからタイトルを補助入力します。取得できない場合はURLから簡易タイトルを作ります。</div>
+      <div id="status" class="status"></div>
       <div class="actions">
-        <button id="saveBtn" class="primary">保存</button>
-        <button id="cancelBtn" class="secondary">閉じる</button>
+        <button id="saveBtn" class="primary" type="button">保存</button>
+        <button id="closeBtn" class="secondary" type="button">閉じる</button>
       </div>
     </section>
 
     <section id="list" class="list"></section>
   </div>
 
-  <button id="openFormBtn" class="floating-add" aria-label="追加">＋</button>
+  <button id="openBtn" class="floating-add" type="button" aria-label="行きたいを追加">＋</button>
 
   <script>
-    const STORAGE_KEY = 'date_spots_minimal_v1';
+    (function () {
+      var STORAGE_KEY = 'date_spots_minimal_v2';
+      var currentTab = 'want';
+      var items = loadItems();
 
-    let currentTab = 'want';
-    let items = loadItems();
+      var listEl = document.getElementById('list');
+      var addPanelEl = document.getElementById('addPanel');
+      var urlInputEl = document.getElementById('urlInput');
+      var statusEl = document.getElementById('status');
+      var saveBtnEl = document.getElementById('saveBtn');
+      var closeBtnEl = document.getElementById('closeBtn');
+      var openBtnEl = document.getElementById('openBtn');
+      var tabWantEl = document.getElementById('tabWant');
+      var tabDoneEl = document.getElementById('tabDone');
 
-    const listEl = document.getElementById('list');
-    const formEl = document.getElementById('addForm');
-    const urlInput = document.getElementById('urlInput');
-    const saveBtn = document.getElementById('saveBtn');
-    const cancelBtn = document.getElementById('cancelBtn');
-    const openFormBtn = document.getElementById('openFormBtn');
-    const tabButtons = document.querySelectorAll('.tab');
-
-    tabButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        currentTab = btn.dataset.tab;
-        tabButtons.forEach(b => b.classList.toggle('active', b === btn));
+      tabWantEl.addEventListener('click', function () {
+        currentTab = 'want';
+        updateTabs();
         render();
       });
-    });
 
-    openFormBtn.addEventListener('click', openForm);
-    cancelBtn.addEventListener('click', closeForm);
-    saveBtn.addEventListener('click', addItem);
-
-    urlInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        addItem();
-      }
-    });
-
-    function loadItems() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-      } catch {
-        return [];
-      }
-    }
-
-    function saveItems() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    }
-
-    function openForm() {
-      formEl.classList.remove('hidden');
-      urlInput.focus();
-    }
-
-    function closeForm() {
-      formEl.classList.add('hidden');
-      urlInput.value = '';
-    }
-
-    function normalizeUrl(value) {
-      const trimmed = value.trim();
-      if (!trimmed) return '';
-      if (/^https?:\/\//i.test(trimmed)) return trimmed;
-      return 'https://' + trimmed;
-    }
-
-    function getDomain(url) {
-      try {
-        return new URL(url).hostname.replace(/^www\./, '');
-      } catch {
-        return '';
-      }
-    }
-
-    function guessTitleFromUrl(url) {
-      try {
-        const u = new URL(url);
-        const lastPath = u.pathname.split('/').filter(Boolean).pop();
-        if (lastPath) {
-          return decodeURIComponent(lastPath)
-            .replace(/[-_]/g, ' ')
-            .replace(/\.[a-z0-9]+$/i, '')
-            .trim();
-        }
-        return u.hostname.replace(/^www\./, '');
-      } catch {
-        return url;
-      }
-    }
-
-    async function fetchTitle(url) {
-      try {
-        const proxyUrl = 'https://r.jina.ai/http://' + url.replace(/^https?:\/\//, '');
-        const res = await fetch(proxyUrl);
-        if (!res.ok) throw new Error('fetch failed');
-        const text = await res.text();
-        const titleMatch = text.match(/<title[^>]*>(.*?)<\/title>/i);
-        if (titleMatch && titleMatch[1]) {
-          return titleMatch[1].trim();
-        }
-      } catch {
-        // no-op
-      }
-      return guessTitleFromUrl(url);
-    }
-
-    async function addItem() {
-      const rawUrl = urlInput.value;
-      const url = normalizeUrl(rawUrl);
-      if (!url) return;
-
-      try {
-        new URL(url);
-      } catch {
-        alert('正しいURLを入力してください');
-        return;
-      }
-
-      saveBtn.disabled = true;
-      saveBtn.textContent = '保存中...';
-
-      const title = await fetchTitle(url);
-      const domain = getDomain(url);
-
-      items.unshift({
-        id: crypto.randomUUID(),
-        url,
-        title: title || domain || url,
-        domain,
-        visited: false,
-        createdAt: Date.now()
+      tabDoneEl.addEventListener('click', function () {
+        currentTab = 'done';
+        updateTabs();
+        render();
       });
 
-      saveItems();
-      render();
-      closeForm();
+      openBtnEl.addEventListener('click', openPanel);
+      closeBtnEl.addEventListener('click', closePanel);
+      saveBtnEl.addEventListener('click', addItem);
 
-      saveBtn.disabled = false;
-      saveBtn.textContent = '保存';
-    }
+      urlInputEl.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          addItem();
+        }
+      });
 
-    function toggleVisited(id) {
-      items = items.map(item => item.id === id ? { ...item, visited: !item.visited } : item);
-      saveItems();
-      render();
-    }
-
-    function removeItem(id) {
-      items = items.filter(item => item.id !== id);
-      saveItems();
-      render();
-    }
-
-    function render() {
-      const filtered = items.filter(item => currentTab === 'want' ? !item.visited : item.visited);
-
-      if (filtered.length === 0) {
-        listEl.innerHTML = `<div class="empty">${currentTab === 'want' ? 'まだ行きたい場所がありません' : 'まだ行った場所がありません'}</div>`;
-        return;
+      function updateTabs() {
+        tabWantEl.classList.toggle('active', currentTab === 'want');
+        tabDoneEl.classList.toggle('active', currentTab === 'done');
       }
 
-      listEl.innerHTML = filtered.map(item => `
-        <article class="card">
-          <div class="card-title">${escapeHtml(item.title)}</div>
-          <div class="card-domain">${escapeHtml(item.domain || 'URL保存')}</div>
-          <a href="${escapeAttr(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.url)}</a>
-          <div class="actions">
-            <button class="primary" onclick="toggleVisited('${item.id}')">${item.visited ? '行きたいに戻す' : '行った'}</button>
-            <button class="secondary" onclick="removeItem('${item.id}')">削除</button>
-          </div>
-        </article>
-      `).join('');
-    }
+      function loadItems() {
+        try {
+          var raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return [];
+          var parsed = JSON.parse(raw);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (error) {
+          return [];
+        }
+      }
 
-    function escapeHtml(str) {
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
+      function saveItems() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      }
 
-    function escapeAttr(str) {
-      return escapeHtml(str);
-    }
+      function openPanel() {
+        addPanelEl.classList.remove('hidden');
+        statusEl.textContent = '';
+        urlInputEl.focus();
+      }
 
-    window.toggleVisited = toggleVisited;
-    window.removeItem = removeItem;
+      function closePanel() {
+        addPanelEl.classList.add('hidden');
+        statusEl.textContent = '';
+        urlInputEl.value = '';
+        saveBtnEl.disabled = false;
+        saveBtnEl.textContent = '保存';
+      }
 
-    render();
+      function normalizeUrl(value) {
+        var trimmed = String(value || '').trim();
+        if (!trimmed) return '';
+        if (/^https?:\/\//i.test(trimmed)) return trimmed;
+        return 'https://' + trimmed;
+      }
+
+      function parseUrl(url) {
+        try {
+          return new URL(url);
+        } catch (error) {
+          return null;
+        }
+      }
+
+      function getDomain(url) {
+        var parsed = parseUrl(url);
+        if (!parsed) return '';
+        return parsed.hostname.replace(/^www\./, '');
+      }
+
+      function guessTitleFromUrl(url) {
+        var parsed = parseUrl(url);
+        if (!parsed) return url;
+
+        var paths = parsed.pathname.split('/').filter(function (part) {
+          return part && part !== '/';
+        });
+
+        var lastPath = paths.length ? paths[paths.length - 1] : '';
+        if (lastPath) {
+          try {
+            lastPath = decodeURIComponent(lastPath);
+          } catch (error) {
+            // ignore
+          }
+          lastPath = lastPath
+            .replace(/[-_]+/g, ' ')
+            .replace(/\.[a-z0-9]+$/i, '')
+            .trim();
+          if (lastPath) return lastPath;
+        }
+
+        return parsed.hostname.replace(/^www\./, '');
+      }
+
+      function createId() {
+        return 'id_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
+      }
+
+      function fetchTitle(url) {
+        return new Promise(function (resolve) {
+          resolve(guessTitleFromUrl(url));
+        });
+      }
+
+      function isDuplicate(url) {
+        return items.some(function (item) {
+          return item.url === url;
+        });
+      }
+
+      function setStatus(message) {
+        statusEl.textContent = message || '';
+      }
+
+      function addItem() {
+        var url = normalizeUrl(urlInputEl.value);
+        if (!url) {
+          setStatus('URLを入力してください');
+          return;
+        }
+
+        if (!parseUrl(url)) {
+          setStatus('正しいURLを入力してください');
+          return;
+        }
+
+        if (isDuplicate(url)) {
+          setStatus('同じURLはすでに登録されています');
+          return;
+        }
+
+        saveBtnEl.disabled = true;
+        saveBtnEl.textContent = '保存中...';
+        setStatus('');
+
+        fetchTitle(url)
+          .then(function (title) {
+            var item = {
+              id: createId(),
+              url: url,
+              title: title || getDomain(url) || url,
+              domain: getDomain(url),
+              visited: false,
+              createdAt: Date.now()
+            };
+
+            items.unshift(item);
+            saveItems();
+            render();
+            closePanel();
+          })
+          .catch(function () {
+            var fallbackItem = {
+              id: createId(),
+              url: url,
+              title: guessTitleFromUrl(url),
+              domain: getDomain(url),
+              visited: false,
+              createdAt: Date.now()
+            };
+
+            items.unshift(fallbackItem);
+            saveItems();
+            render();
+            closePanel();
+          })
+          .finally(function () {
+            saveBtnEl.disabled = false;
+            saveBtnEl.textContent = '保存';
+          });
+      }
+
+      function toggleVisited(id) {
+        items = items.map(function (item) {
+          if (item.id === id) {
+            item.visited = !item.visited;
+          }
+          return item;
+        });
+        saveItems();
+        render();
+      }
+
+      function removeItem(id) {
+        items = items.filter(function (item) {
+          return item.id !== id;
+        });
+        saveItems();
+        render();
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function render() {
+        var filtered = items.filter(function (item) {
+          return currentTab === 'want' ? !item.visited : item.visited;
+        });
+
+        if (!filtered.length) {
+          listEl.innerHTML = '<div class="empty">' +
+            (currentTab === 'want' ? 'まだ行きたい場所がありません' : 'まだ行った場所がありません') +
+            '</div>';
+          return;
+        }
+
+        var html = filtered.map(function (item) {
+          return '' +
+            '<article class="card">' +
+              '<div class="card-title">' + escapeHtml(item.title) + '</div>' +
+              '<div class="card-domain">' + escapeHtml(item.domain || 'URL保存') + '</div>' +
+              '<a class="card-link" href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(item.url) + '</a>' +
+              '<div class="actions">' +
+                '<button class="primary" type="button" data-action="toggle" data-id="' + escapeHtml(item.id) + '">' + (item.visited ? '行きたいに戻す' : '行った') + '</button>' +
+                '<button class="danger" type="button" data-action="delete" data-id="' + escapeHtml(item.id) + '">削除</button>' +
+              '</div>' +
+            '</article>';
+        }).join('');
+
+        listEl.innerHTML = html;
+      }
+
+      listEl.addEventListener('click', function (event) {
+        var target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+
+        var action = target.getAttribute('data-action');
+        var id = target.getAttribute('data-id');
+        if (!action || !id) return;
+
+        if (action === 'toggle') {
+          toggleVisited(id);
+        } else if (action === 'delete') {
+          removeItem(id);
+        }
+      });
+
+      updateTabs();
+      render();
+    })();
   </script>
 </body>
 </html>
