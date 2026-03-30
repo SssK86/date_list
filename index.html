@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>行きたいリスト</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -22,10 +20,18 @@
       padding: 20px 16px 40px;
     }
 
+    .header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
     h1 {
-      margin: 0 0 20px;
+      margin: 0;
       font-size: 28px;
-      text-align: center;
+      line-height: 1.2;
     }
 
     .panel,
@@ -47,92 +53,6 @@
       margin: 0 0 12px;
       font-size: 18px;
       font-weight: 700;
-    }
-
-    .header-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    .header-bar h1 {
-      margin: 0;
-      text-align: left;
-      flex: 1;
-    }
-
-    .account-menu {
-      position: relative;
-      flex-shrink: 0;
-    }
-
-    .account-btn {
-      border: none;
-      background: #fff;
-      color: #222;
-      border-radius: 999px;
-      padding: 10px 12px;
-      font-size: 12px;
-      font-weight: 700;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      max-width: 180px;
-    }
-
-    .account-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #9ca3af;
-      flex-shrink: 0;
-    }
-
-    .account-dot.logged-in {
-      background: #16a34a;
-    }
-
-    .account-label {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .account-dropdown {
-      position: absolute;
-      top: calc(100% + 8px);
-      right: 0;
-      width: min(300px, 80vw);
-      background: #fff;
-      border-radius: 14px;
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
-      padding: 14px;
-      z-index: 1000;
-    }
-
-    .account-dropdown.hidden {
-      display: none;
-    }
-
-    .account-email {
-      font-size: 13px;
-      color: #555;
-      line-height: 1.5;
-      word-break: break-all;
-      margin-bottom: 12px;
-    }
-
-    .account-actions {
-      display: grid;
-      gap: 8px;
-    }
-
-    .account-actions button {
-      width: 100%;
     }
 
     .panel-text {
@@ -173,12 +93,7 @@
       border-color: #888;
     }
 
-    .add-btn,
-    .login-btn,
-    .reload-btn,
-    .logout-btn,
-    .delete-btn,
-    .toggle-btn {
+    button {
       border: none;
       border-radius: 10px;
       padding: 12px 14px;
@@ -205,16 +120,10 @@
       color: #fff;
     }
 
-    .add-btn {
+    .add-btn,
+    .login-btn {
       width: 100%;
       font-size: 16px;
-    }
-
-    .top-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 12px;
     }
 
     .sub-note {
@@ -230,26 +139,14 @@
       line-height: 1.5;
       color: #444;
       min-height: 1.4em;
+      white-space: pre-wrap;
+      word-break: break-word;
     }
 
-    .status.error {
-      color: #c62828;
-    }
+    .status.error { color: #c62828; }
+    .status.success { color: #2e7d32; }
 
-    .status.success {
-      color: #2e7d32;
-    }
-
-    .user-info {
-      font-size: 13px;
-      color: #555;
-      line-height: 1.6;
-      word-break: break-all;
-    }
-
-    .hidden {
-      display: none;
-    }
+    .hidden { display: none !important; }
 
     .tabs {
       display: flex;
@@ -285,16 +182,8 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
-    .card-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 10px;
-    }
-
     .card-title {
-      margin: 0;
+      margin: 0 0 10px;
       font-size: 18px;
       line-height: 1.4;
       word-break: break-word;
@@ -338,7 +227,7 @@
     }
 
     .confirm-modal.hidden {
-      display: none;
+      display: none !important;
     }
 
     .confirm-box {
@@ -359,16 +248,6 @@
       justify-content: center;
     }
 
-    .confirm-actions button {
-      min-width: 96px;
-      border: none;
-      border-radius: 10px;
-      padding: 10px 16px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
     .danger-btn {
       background: #e53935;
       color: #fff;
@@ -379,33 +258,80 @@
       color: #333;
     }
 
+    .account-wrap {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .account-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      color: #222;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      max-width: 180px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .account-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #9ca3af;
+      flex-shrink: 0;
+    }
+
+    .account-dot.logged-in {
+      background: #16a34a;
+    }
+
+    .account-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .account-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: min(280px, 80vw);
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+      padding: 14px;
+      z-index: 1000;
+    }
+
+    .account-email {
+      font-size: 13px;
+      color: #555;
+      line-height: 1.5;
+      word-break: break-all;
+      margin-bottom: 12px;
+      white-space: pre-wrap;
+    }
+
+    .account-actions {
+      display: grid;
+      gap: 8px;
+    }
+
+    .account-actions button {
+      width: 100%;
+    }
+
     @media (max-width: 480px) {
-      h1 {
-        font-size: 24px;
-      }
-
-      .header-bar {
-        align-items: flex-start;
-      }
-
-      .account-btn {
-        max-width: 120px;
-        padding: 9px 10px;
-      }
-
-      .actions,
-      .top-actions,
-      .confirm-actions {
-        flex-direction: column;
-      }
-
-      .delete-btn,
-      .reload-btn,
-      .logout-btn,
-      .toggle-btn,
-      .confirm-actions button {
-        width: 100%;
-      }
+      h1 { font-size: 24px; }
+      .actions, .confirm-actions { flex-direction: column; }
+      .delete-btn, .toggle-btn, .confirm-actions button { width: 100%; }
+      .account-btn { max-width: 120px; }
     }
   </style>
 </head>
@@ -413,12 +339,12 @@
   <div class="container">
     <div class="header-bar">
       <h1>行きたいリスト</h1>
-      <div class="account-menu">
-        <button id="accountBtn" class="account-btn" type="button" aria-label="アカウントメニュー">
+      <div class="account-wrap">
+        <button id="accountBtn" class="account-btn hidden" type="button" aria-label="アカウントメニュー">
           <span id="accountDot" class="account-dot"></span>
           <span id="accountLabel" class="account-label">未ログイン</span>
         </button>
-        <div id="accountDropdown" class="account-dropdown hidden">
+        <div id="accountMenu" class="account-menu hidden">
           <div id="accountEmail" class="account-email">ログインしていません</div>
           <div class="account-actions">
             <button id="reloadBtn" class="reload-btn" type="button">再読み込み</button>
@@ -430,16 +356,12 @@
 
     <section id="authPanel" class="panel">
       <h2 class="panel-title">ログイン</h2>
-      <p class="panel-text">
-        まずは自分のアカウントでログインしてください。彼女のログイン対応は後から追加できます。
-      </p>
-
+      <p class="panel-text">初回のみメールでログインしてください。同じブラウザでは通常そのまま使えます。</p>
       <div class="form-group">
         <label for="emailInput">メールアドレス</label>
         <input id="emailInput" type="email" placeholder="example@example.com" />
       </div>
-
-      <button id="loginBtn" class="login-btn">Magic Link を送信</button>
+      <button id="loginBtn" class="login-btn" type="button">Magic Link を送信</button>
       <div id="authStatus" class="status"></div>
     </section>
 
@@ -449,16 +371,12 @@
           <label for="shopName">店名</label>
           <input id="shopName" type="text" placeholder="例：焼肉〇〇" />
         </div>
-
         <div class="form-group">
           <label for="shopUrl">URL</label>
           <input id="shopUrl" type="url" placeholder="https://example.com" />
         </div>
-
-        <button class="add-btn" id="addBtn">追加する</button>
-        <div class="sub-note">
-          保存先は Supabase です。今は自動同期なしで、再読み込みすると最新内容を確認できます。
-        </div>
+        <button class="add-btn" id="addBtn" type="button">追加する</button>
+        <div class="sub-note">保存先は Supabase です。再読み込みで最新内容を確認できます。</div>
         <div id="itemStatus" class="status"></div>
       </section>
 
@@ -475,8 +393,8 @@
     <div class="confirm-box">
       <p class="confirm-text">このお店を削除していいですか？</p>
       <div class="confirm-actions">
-        <button id="confirmDeleteYes" class="danger-btn">はい</button>
-        <button id="confirmDeleteNo" class="secondary-btn">いいえ</button>
+        <button id="confirmDeleteYes" class="danger-btn" type="button">はい</button>
+        <button id="confirmDeleteNo" class="secondary-btn" type="button">いいえ</button>
       </div>
     </div>
   </div>
@@ -492,10 +410,10 @@
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let items = [];
-    let pendingDeleteId = null;
     let currentUser = null;
+    let items = [];
     let currentTab = "want";
+    let pendingDeleteId = null;
 
     const authPanelEl = document.getElementById("authPanel");
     const appPanelEl = document.getElementById("appPanel");
@@ -504,18 +422,18 @@
     const authStatusEl = document.getElementById("authStatus");
 
     const accountBtnEl = document.getElementById("accountBtn");
+    const accountMenuEl = document.getElementById("accountMenu");
     const accountDotEl = document.getElementById("accountDot");
     const accountLabelEl = document.getElementById("accountLabel");
-    const accountDropdownEl = document.getElementById("accountDropdown");
     const accountEmailEl = document.getElementById("accountEmail");
     const reloadBtnEl = document.getElementById("reloadBtn");
     const logoutBtnEl = document.getElementById("logoutBtn");
 
-    const listEl = document.getElementById("list");
     const shopNameEl = document.getElementById("shopName");
     const shopUrlEl = document.getElementById("shopUrl");
     const addBtnEl = document.getElementById("addBtn");
     const itemStatusEl = document.getElementById("itemStatus");
+    const listEl = document.getElementById("list");
 
     const tabWantEl = document.getElementById("tabWant");
     const tabDoneEl = document.getElementById("tabDone");
@@ -545,52 +463,73 @@
       return "https://" + trimmed;
     }
 
+    function closeAccountMenu() {
+      accountMenuEl.classList.add("hidden");
+    }
+
+    function updateAccountUi() {
+      if (currentUser) {
+        accountBtnEl.classList.remove("hidden");
+        accountDotEl.classList.add("logged-in");
+        accountLabelEl.textContent = currentUser.email || "ログイン中";
+        accountEmailEl.textContent = (currentUser.email || "") + "\nユーザーID: " + (currentUser.id || "");
+      } else {
+        accountBtnEl.classList.add("hidden");
+        accountDotEl.classList.remove("logged-in");
+        accountLabelEl.textContent = "未ログイン";
+        accountEmailEl.textContent = "ログインしていません";
+        closeAccountMenu();
+      }
+    }
+
     function updateTabs() {
       tabWantEl.classList.toggle("active", currentTab === "want");
       tabDoneEl.classList.toggle("active", currentTab === "done");
     }
 
-    function closeAccountDropdown() {
-      accountDropdownEl.classList.add("hidden");
-    }
+    function renderItems() {
+      const filteredItems = items.filter((item) => currentTab === "want" ? !item.visited : item.visited);
 
-    function updateAccountUi() {
-      if (currentUser) {
-        accountDotEl.classList.add("logged-in");
-        accountLabelEl.textContent = currentUser.email || "ログイン中";
-        accountEmailEl.textContent = (currentUser.email || "") + "
-ユーザーID: " + (currentUser.id || "");
-        reloadBtnEl.disabled = false;
-        logoutBtnEl.disabled = false;
-      } else {
-        accountDotEl.classList.remove("logged-in");
-        accountLabelEl.textContent = "未ログイン";
-        accountEmailEl.textContent = "ログインしていません";
-        reloadBtnEl.disabled = true;
-        logoutBtnEl.disabled = true;
+      if (filteredItems.length === 0) {
+        listEl.innerHTML = `<div class="empty">${currentTab === "want" ? "まだ行きたいお店が登録されていません。" : "まだ行ったお店がありません。"}</div>`;
+        return;
       }
+
+      listEl.innerHTML = filteredItems.map((item) => {
+        const safeId = escapeHtml(item.id);
+        const safeName = escapeHtml(item.name);
+        const safeUrl = escapeHtml(item.url);
+        return `
+          <article class="card">
+            <h2 class="card-title">${safeName}</h2>
+            <a class="url" href="${safeUrl}" target="_blank" rel="noopener noreferrer">${safeUrl}</a>
+            <div class="actions">
+              <button class="toggle-btn" type="button" data-toggle-id="${safeId}" data-next-visited="${item.visited ? "false" : "true"}">${item.visited ? "行きたいに戻す" : "行った"}</button>
+              <button class="delete-btn" type="button" data-delete-id="${safeId}">削除</button>
+            </div>
+          </article>
+        `;
+      }).join("");
     }
 
     function showLoggedOut() {
-      authPanelEl.classList.remove("hidden");
-      appPanelEl.classList.add("hidden");
       currentUser = null;
       items = [];
+      authPanelEl.classList.remove("hidden");
+      appPanelEl.classList.add("hidden");
       updateAccountUi();
-      closeAccountDropdown();
       renderItems();
     }
 
     function showLoggedIn(user) {
+      currentUser = user;
       authPanelEl.classList.add("hidden");
       appPanelEl.classList.remove("hidden");
-      currentUser = user;
       updateAccountUi();
     }
 
     async function sendMagicLink() {
       const email = emailInputEl.value.trim();
-
       if (!email) {
         setStatus(authStatusEl, "メールアドレスを入力してください。", "error");
         return;
@@ -601,9 +540,7 @@
 
       const { error } = await supabase.auth.signInWithOtp({
         email,
-        options: {
-          emailRedirectTo: REDIRECT_URL
-        }
+        options: { emailRedirectTo: REDIRECT_URL }
       });
 
       loginBtnEl.disabled = false;
@@ -613,45 +550,15 @@
         return;
       }
 
-      setStatus(authStatusEl, "Magic Link を送信しました。メールを確認してください。", "success");
+      setStatus(authStatusEl, "Magic Link を送信しました。最新メールのリンクを開いてください。", "success");
     }
 
-    async function loadSessionAndItems() {
-      setStatus(authStatusEl, "");
-      setStatus(itemStatusEl, "");
-
-      const {
-        data: { session },
-        error: sessionError
-      } = await supabase.auth.getSession();
-
-      if (sessionError) {
-        showLoggedOut();
-        setStatus(authStatusEl, "セッション確認に失敗しました: " + sessionError.message, "error");
-        return;
-      }
-
-      if (!session || !session.user) {
-        showLoggedOut();
-        return;
-      }
-
-      if (session.user.id !== EXPECTED_USER_ID) {
-        showLoggedOut();
-        setStatus(authStatusEl, "この画面は現在、指定したユーザーIDのみ利用できます。", "error");
-        return;
-      }
-
-      showLoggedIn(session.user);
-      await verifyMembershipAndLoadItems();
-    }
-
-    async function verifyMembershipAndLoadItems() {
+    async function verifyMembershipAndLoadItems(user) {
       const { data: membership, error: membershipError } = await supabase
         .from("list_members")
-        .select("id, list_id, user_id, role")
+        .select("id, user_id, list_id, role")
         .eq("list_id", SHARED_LIST_ID)
-        .eq("user_id", EXPECTED_USER_ID)
+        .eq("user_id", user.id)
         .maybeSingle();
 
       if (membershipError) {
@@ -688,8 +595,8 @@
       }
 
       items = Array.isArray(data) ? data : [];
-      renderItems();
       setStatus(itemStatusEl, "", "");
+      renderItems();
     }
 
     async function addItem() {
@@ -700,12 +607,10 @@
         setStatus(itemStatusEl, "先にログインしてください。", "error");
         return;
       }
-
       if (!name) {
         setStatus(itemStatusEl, "店名を入力してください。", "error");
         return;
       }
-
       if (!url) {
         setStatus(itemStatusEl, "URLを入力してください。", "error");
         return;
@@ -739,7 +644,6 @@
       shopNameEl.value = "";
       shopUrlEl.value = "";
       shopNameEl.focus();
-
       setStatus(itemStatusEl, "保存しました。", "success");
       await loadItems();
     }
@@ -790,156 +694,134 @@
       await loadItems();
     }
 
-    function renderItems() {
-      const filteredItems = items.filter(item => {
-        return currentTab === "want" ? !item.visited : item.visited;
-      });
+    async function handleSession() {
+      setStatus(authStatusEl, "", "");
+      setStatus(itemStatusEl, "", "");
 
-      if (filteredItems.length === 0) {
-        listEl.innerHTML = `
-          <div class="empty">
-            ${currentTab === "want" ? "まだ行きたいお店が登録されていません。" : "まだ行ったお店がありません。"}
-          </div>
-        `;
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        showLoggedOut();
+        setStatus(authStatusEl, "セッション確認に失敗しました: " + error.message, "error");
         return;
       }
 
-      listEl.innerHTML = filteredItems.map(item => {
-        const safeName = escapeHtml(item.name);
-        const safeUrl = escapeHtml(item.url);
-        const safeId = escapeHtml(item.id);
+      const session = data.session;
+      if (!session || !session.user) {
+        showLoggedOut();
+        return;
+      }
 
-        return `
-          <article class="card">
-            <div class="card-header">
-              <h2 class="card-title">${safeName}</h2>
-            </div>
+      if (session.user.id !== EXPECTED_USER_ID) {
+        showLoggedOut();
+        setStatus(authStatusEl, "この画面は現在、指定したユーザーIDのみ利用できます。", "error");
+        return;
+      }
 
-            <a class="url" href="${safeUrl}" target="_blank" rel="noopener noreferrer">
-              ${safeUrl}
-            </a>
-
-            <div class="actions">
-              <button class="toggle-btn" data-toggle-id="${safeId}" data-next-visited="${item.visited ? "false" : "true"}">
-                ${item.visited ? "行きたいに戻す" : "行った"}
-              </button>
-              <button class="delete-btn" data-delete-id="${safeId}">削除</button>
-            </div>
-          </article>
-        `;
-      }).join("");
+      showLoggedIn(session.user);
+      await verifyMembershipAndLoadItems(session.user);
     }
 
-    accountBtnEl.addEventListener("click", () => {
-      accountDropdownEl.classList.toggle("hidden");
-    });
+    function bindEvents() {
+      accountBtnEl.addEventListener("click", (event) => {
+        event.stopPropagation();
+        accountMenuEl.classList.toggle("hidden");
+      });
 
-    document.addEventListener("click", (event) => {
-      if (!accountBtnEl.contains(event.target) && !accountDropdownEl.contains(event.target)) {
-        closeAccountDropdown();
-      }
-    });
+      accountMenuEl.addEventListener("click", (event) => {
+        event.stopPropagation();
+      });
 
-    loginBtnEl.addEventListener("click", sendMagicLink);
+      document.addEventListener("click", () => {
+        closeAccountMenu();
+      });
 
-    emailInputEl.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        sendMagicLink();
-      }
-    });
+      loginBtnEl.addEventListener("click", sendMagicLink);
+      emailInputEl.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") sendMagicLink();
+      });
 
-    addBtnEl.addEventListener("click", addItem);
+      addBtnEl.addEventListener("click", addItem);
+      shopNameEl.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") addItem();
+      });
+      shopUrlEl.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") addItem();
+      });
 
-    shopNameEl.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        addItem();
-      }
-    });
+      reloadBtnEl.addEventListener("click", async () => {
+        closeAccountMenu();
+        await loadItems();
+      });
 
-    shopUrlEl.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        addItem();
-      }
-    });
-
-    reloadBtnEl.addEventListener("click", async () => {
-      await loadItems();
-    });
-
-    logoutBtnEl.addEventListener("click", async () => {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        setStatus(itemStatusEl, "ログアウトに失敗しました: " + error.message, "error");
-        return;
-      }
-
-      showLoggedOut();
-      setStatus(authStatusEl, "ログアウトしました。", "success");
-    });
-
-    tabWantEl.addEventListener("click", () => {
-      currentTab = "want";
-      updateTabs();
-      renderItems();
-    });
-
-    tabDoneEl.addEventListener("click", () => {
-      currentTab = "done";
-      updateTabs();
-      renderItems();
-    });
-
-    listEl.addEventListener("click", async (event) => {
-      const target = event.target;
-      if (!(target instanceof HTMLElement)) return;
-
-      const deleteId = target.getAttribute("data-delete-id");
-      if (deleteId) {
-        openDeleteConfirm(deleteId);
-        return;
-      }
-
-      const toggleId = target.getAttribute("data-toggle-id");
-      const nextVisited = target.getAttribute("data-next-visited");
-      if (toggleId && nextVisited !== null) {
-        await toggleVisited(toggleId, nextVisited === "true");
-      }
-    });
-
-    confirmDeleteYesEl.addEventListener("click", async () => {
-      if (pendingDeleteId !== null) {
-        await deleteItem(pendingDeleteId);
-      }
-      closeDeleteConfirm();
-    });
-
-    confirmDeleteNoEl.addEventListener("click", () => {
-      closeDeleteConfirm();
-    });
-
-    deleteConfirmModalEl.addEventListener("click", (event) => {
-      if (event.target === deleteConfirmModalEl) {
-        closeDeleteConfirm();
-      }
-    });
-
-    updateTabs();
-    updateAccountUi();
-    await loadSessionAndItems();
-
-    supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session && session.user) {
-        if (session.user.id !== EXPECTED_USER_ID) {
-          showLoggedOut();
-          setStatus(authStatusEl, "この画面は現在、指定したユーザーIDのみ利用できます。", "error");
+      logoutBtnEl.addEventListener("click", async () => {
+        closeAccountMenu();
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+          setStatus(itemStatusEl, "ログアウトに失敗しました: " + error.message, "error");
           return;
         }
-        showLoggedIn(session.user);
-        await verifyMembershipAndLoadItems();
-      } else {
         showLoggedOut();
-      }
-    });
+        setStatus(authStatusEl, "ログアウトしました。", "success");
+      });
+
+      tabWantEl.addEventListener("click", () => {
+        currentTab = "want";
+        updateTabs();
+        renderItems();
+      });
+
+      tabDoneEl.addEventListener("click", () => {
+        currentTab = "done";
+        updateTabs();
+        renderItems();
+      });
+
+      listEl.addEventListener("click", async (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+
+        const deleteId = target.getAttribute("data-delete-id");
+        if (deleteId) {
+          openDeleteConfirm(deleteId);
+          return;
+        }
+
+        const toggleId = target.getAttribute("data-toggle-id");
+        const nextVisited = target.getAttribute("data-next-visited");
+        if (toggleId && nextVisited !== null) {
+          await toggleVisited(toggleId, nextVisited === "true");
+        }
+      });
+
+      confirmDeleteYesEl.addEventListener("click", async () => {
+        if (pendingDeleteId) {
+          await deleteItem(pendingDeleteId);
+        }
+        closeDeleteConfirm();
+      });
+
+      confirmDeleteNoEl.addEventListener("click", closeDeleteConfirm);
+      deleteConfirmModalEl.addEventListener("click", (event) => {
+        if (event.target === deleteConfirmModalEl) closeDeleteConfirm();
+      });
+
+      supabase.auth.onAuthStateChange((_event, session) => {
+        if (session && session.user) {
+          handleSession();
+        } else {
+          showLoggedOut();
+        }
+      });
+    }
+
+    async function init() {
+      updateTabs();
+      updateAccountUi();
+      bindEvents();
+      await handleSession();
+    }
+
+    init();
   </script>
 </body>
 </html>
