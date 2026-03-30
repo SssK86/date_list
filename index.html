@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ふたりで行きたい</title>
+  <title>行きたいリスト</title>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -54,20 +54,16 @@
       font-size: 14px;
       font-weight: 600;
     }
+    input[type="text"],
     input[type="url"] {
       width: 100%;
       padding: 12px;
       border: 1px solid #d1d5db;
       border-radius: 12px;
       font-size: 14px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       background: #ffffff;
       color: #111827;
-    }
-    .hint {
-      font-size: 12px;
-      color: #6b7280;
-      margin-bottom: 12px;
     }
     .actions {
       display: flex;
@@ -142,7 +138,7 @@
     }
     .status {
       font-size: 13px;
-      color: #6b7280;
+      color: #b91c1c;
       margin-bottom: 12px;
       min-height: 1.2em;
     }
@@ -150,7 +146,7 @@
 </head>
 <body>
   <div class="app">
-    <h1>ふたりで行きたい</h1>
+    <h1>行きたいリスト</h1>
 
     <div class="tabs">
       <button id="tabWant" class="tab active" type="button">行きたい</button>
@@ -158,10 +154,14 @@
     </div>
 
     <section id="addPanel" class="panel hidden">
+      <label for="nameInput">店名</label>
+      <input id="nameInput" type="text" placeholder="店名を入力" />
+
       <label for="urlInput">URL</label>
       <input id="urlInput" type="url" placeholder="お店やスポットのURLを貼り付け" />
-      <div class="hint">URLからタイトルを補助入力します。取得できない場合はURLから簡易タイトルを作ります。</div>
+
       <div id="status" class="status"></div>
+
       <div class="actions">
         <button id="saveBtn" class="primary" type="button">保存</button>
         <button id="closeBtn" class="secondary" type="button">閉じる</button>
@@ -175,12 +175,13 @@
 
   <script>
     (function () {
-      var STORAGE_KEY = 'date_spots_minimal_v2';
+      var STORAGE_KEY = 'date_spots_manual_v1';
       var currentTab = 'want';
       var items = loadItems();
 
       var listEl = document.getElementById('list');
       var addPanelEl = document.getElementById('addPanel');
+      var nameInputEl = document.getElementById('nameInput');
       var urlInputEl = document.getElementById('urlInput');
       var statusEl = document.getElementById('status');
       var saveBtnEl = document.getElementById('saveBtn');
@@ -204,6 +205,13 @@
       openBtnEl.addEventListener('click', openPanel);
       closeBtnEl.addEventListener('click', closePanel);
       saveBtnEl.addEventListener('click', addItem);
+
+      nameInputEl.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          addItem();
+        }
+      });
 
       urlInputEl.addEventListener('keydown', function (event) {
         if (event.key === 'Enter') {
@@ -235,15 +243,14 @@
       function openPanel() {
         addPanelEl.classList.remove('hidden');
         statusEl.textContent = '';
-        urlInputEl.focus();
+        nameInputEl.focus();
       }
 
       function closePanel() {
         addPanelEl.classList.add('hidden');
         statusEl.textContent = '';
+        nameInputEl.value = '';
         urlInputEl.value = '';
-        saveBtnEl.disabled = false;
-        saveBtnEl.textContent = '保存';
       }
 
       function normalizeUrl(value) {
@@ -267,107 +274,52 @@
         return parsed.hostname.replace(/^www\./, '');
       }
 
-      function guessTitleFromUrl(url) {
-        var parsed = parseUrl(url);
-        if (!parsed) return url;
-
-        var paths = parsed.pathname.split('/').filter(function (part) {
-          return part && part !== '/';
-        });
-
-        var lastPath = paths.length ? paths[paths.length - 1] : '';
-        if (lastPath) {
-          try {
-            lastPath = decodeURIComponent(lastPath);
-          } catch (error) {
-            // ignore
-          }
-          lastPath = lastPath
-            .replace(/[-_]+/g, ' ')
-            .replace(/\.[a-z0-9]+$/i, '')
-            .trim();
-          if (lastPath) return lastPath;
-        }
-
-        return parsed.hostname.replace(/^www\./, '');
-      }
-
       function createId() {
         return 'id_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
       }
 
-      function fetchTitle(url) {
-        return new Promise(function (resolve) {
-          resolve(guessTitleFromUrl(url));
-        });
-      }
-
-      function isDuplicate(url) {
+      function isDuplicate(url, name) {
         return items.some(function (item) {
-          return item.url === url;
+          return item.url === url && item.name === name;
         });
-      }
-
-      function setStatus(message) {
-        statusEl.textContent = message || '';
       }
 
       function addItem() {
+        var name = String(nameInputEl.value || '').trim();
         var url = normalizeUrl(urlInputEl.value);
+
+        if (!name) {
+          statusEl.textContent = '店名を入力してください';
+          return;
+        }
+
         if (!url) {
-          setStatus('URLを入力してください');
+          statusEl.textContent = 'URLを入力してください';
           return;
         }
 
         if (!parseUrl(url)) {
-          setStatus('正しいURLを入力してください');
+          statusEl.textContent = '正しいURLを入力してください';
           return;
         }
 
-        if (isDuplicate(url)) {
-          setStatus('同じURLはすでに登録されています');
+        if (isDuplicate(url, name)) {
+          statusEl.textContent = '同じ店名とURLはすでに登録されています';
           return;
         }
 
-        saveBtnEl.disabled = true;
-        saveBtnEl.textContent = '保存中...';
-        setStatus('');
+        items.unshift({
+          id: createId(),
+          name: name,
+          url: url,
+          domain: getDomain(url),
+          visited: false,
+          createdAt: Date.now()
+        });
 
-        fetchTitle(url)
-          .then(function (title) {
-            var item = {
-              id: createId(),
-              url: url,
-              title: title || getDomain(url) || url,
-              domain: getDomain(url),
-              visited: false,
-              createdAt: Date.now()
-            };
-
-            items.unshift(item);
-            saveItems();
-            render();
-            closePanel();
-          })
-          .catch(function () {
-            var fallbackItem = {
-              id: createId(),
-              url: url,
-              title: guessTitleFromUrl(url),
-              domain: getDomain(url),
-              visited: false,
-              createdAt: Date.now()
-            };
-
-            items.unshift(fallbackItem);
-            saveItems();
-            render();
-            closePanel();
-          })
-          .finally(function () {
-            saveBtnEl.disabled = false;
-            saveBtnEl.textContent = '保存';
-          });
+        saveItems();
+        render();
+        closePanel();
       }
 
       function toggleVisited(id) {
@@ -413,7 +365,7 @@
         var html = filtered.map(function (item) {
           return '' +
             '<article class="card">' +
-              '<div class="card-title">' + escapeHtml(item.title) + '</div>' +
+              '<div class="card-title">' + escapeHtml(item.name) + '</div>' +
               '<div class="card-domain">' + escapeHtml(item.domain || 'URL保存') + '</div>' +
               '<a class="card-link" href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(item.url) + '</a>' +
               '<div class="actions">' +
