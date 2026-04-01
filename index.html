@@ -358,7 +358,7 @@
 
     <section id="authPanel" class="panel">
       <h2 class="panel-title">ログイン</h2>
-      <p class="panel-text">初回のみメール認証してください。Yahooメールで受け取った6桁コードをこの画面に入力できます。list_members に登録されたユーザーだけがこの共有リストを使えます。</p>
+      <p class="panel-text">初回のみメール認証してください。メールで受け取った6桁コードをこの画面に入力できます。</p>
       <div class="form-group">
         <label for="emailInput">メールアドレス</label>
         <input id="emailInput" type="email" placeholder="example@example.com" />
@@ -373,7 +373,6 @@
         <button id="verifyBtn" class="verify-btn" type="button">コードを確認してログイン</button>
       </div>
 
-      <div class="sub-note">Supabase のメールテンプレートがOTP対応になっている必要があります。</div>
       <div id="authStatus" class="status"></div>
     </section>
 
