@@ -358,7 +358,7 @@
 
     <section id="authPanel" class="panel">
       <h2 class="panel-title">ログイン</h2>
-      <p class="panel-text">初回のみメール認証してください。メールで受け取った6桁コードをこの画面に入力できます。</p>
+      <p class="panel-text">初回のみメール認証してください。Yahooメールで受け取った6桁コードをこの画面に入力できます。list_members に登録されたユーザーだけがこの共有リストを使えます。</p>
       <div class="form-group">
         <label for="emailInput">メールアドレス</label>
         <input id="emailInput" type="email" placeholder="example@example.com" />
@@ -373,6 +373,7 @@
         <button id="verifyBtn" class="verify-btn" type="button">コードを確認してログイン</button>
       </div>
 
+      <div class="sub-note">Supabase のメールテンプレートがOTP対応になっている必要があります。</div>
       <div id="authStatus" class="status"></div>
     </section>
 
@@ -414,7 +415,7 @@
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
     const SUPABASE_URL = "https://iivycgqxkxkwtjwstgpl.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpdnljZ3F4a3hrd3Rqd3N0Z3BsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MjkzMDQsImV4cCI6MjA5MDQwNTMwNH0.Pm1G7u-7e8-6SB0xCL1CjntJyqpln5VpT-vRO-0L6pE";
+    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
     const SHARED_LIST_ID = "d22a3c77-f232-49cd-84ee-50c5fcee3bef";
     
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -551,7 +552,7 @@
       loginBtnEl.disabled = true;
       setStatus(authStatusEl, "認証コードを送信中...", "");
 
-      const { error } = await supabase.auth.verifyOtp({
+      const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
           shouldCreateUser: true
