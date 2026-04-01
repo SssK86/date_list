@@ -104,6 +104,7 @@
 
     .add-btn,
     .login-btn,
+    .verify-btn,
     .toggle-btn {
       background: #222;
       color: #fff;
@@ -121,7 +122,8 @@
     }
 
     .add-btn,
-    .login-btn {
+    .login-btn,
+    .verify-btn {
       width: 100%;
       font-size: 16px;
     }
@@ -356,12 +358,22 @@
 
     <section id="authPanel" class="panel">
       <h2 class="panel-title">ログイン</h2>
-      <p class="panel-text">初回のみメールでログインしてください。同じブラウザでは通常そのまま使えます。</p>
+      <p class="panel-text">初回のみメール認証してください。Yahooメールで受け取った6桁コードをこの画面に入力できます。list_members に登録されたユーザーだけがこの共有リストを使えます。</p>
       <div class="form-group">
         <label for="emailInput">メールアドレス</label>
         <input id="emailInput" type="email" placeholder="example@example.com" />
       </div>
-      <button id="loginBtn" class="login-btn" type="button">Magic Link を送信</button>
+      <button id="loginBtn" class="login-btn" type="button">認証コードを送信</button>
+
+      <div id="otpPanel" class="hidden">
+        <div class="form-group" style="margin-top: 12px;">
+          <label for="otpInput">認証コード</label>
+          <input id="otpInput" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="6桁コード" maxlength="6" />
+        </div>
+        <button id="verifyBtn" class="verify-btn" type="button">コードを確認してログイン</button>
+      </div>
+
+      <div class="sub-note">Supabase のメールテンプレートがOTP対応になっている必要があります。</div>
       <div id="authStatus" class="status"></div>
     </section>
 
@@ -405,22 +417,24 @@
     const SUPABASE_URL = "https://iivycgqxkxkwtjwstgpl.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpdnljZ3F4a3hrd3Rqd3N0Z3BsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MjkzMDQsImV4cCI6MjA5MDQwNTMwNH0.Pm1G7u-7e8-6SB0xCL1CjntJyqpln5VpT-vRO-0L6pE";
     const SHARED_LIST_ID = "d22a3c77-f232-49cd-84ee-50c5fcee3bef";
-    const REDIRECT_URL = "https://sssk86.github.io/date_list/";
-    const EXPECTED_USER_ID = "cb5a1f47-c3b6-4ce9-b14d-ab836305bab6";
-
+    
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentUser = null;
     let items = [];
     let currentTab = "want";
     let pendingDeleteId = null;
+    let pendingEmail = "";
 
     const authPanelEl = document.getElementById("authPanel");
-    const appPanelEl = document.getElementById("appPanel");
     const emailInputEl = document.getElementById("emailInput");
     const loginBtnEl = document.getElementById("loginBtn");
+    const otpPanelEl = document.getElementById("otpPanel");
+    const otpInputEl = document.getElementById("otpInput");
+    const verifyBtnEl = document.getElementById("verifyBtn");
     const authStatusEl = document.getElementById("authStatus");
 
+    const appPanelEl = document.getElementById("appPanel");
     const accountBtnEl = document.getElementById("accountBtn");
     const accountMenuEl = document.getElementById("accountMenu");
     const accountDotEl = document.getElementById("accountDot");
@@ -528,7 +542,7 @@
       updateAccountUi();
     }
 
-    async function sendMagicLink() {
+    async function sendOtpCode() {
       const email = emailInputEl.value.trim();
       if (!email) {
         setStatus(authStatusEl, "メールアドレスを入力してください。", "error");
@@ -536,11 +550,13 @@
       }
 
       loginBtnEl.disabled = true;
-      setStatus(authStatusEl, "送信中...", "");
+      setStatus(authStatusEl, "認証コードを送信中...", "");
 
       const { error } = await supabase.auth.signInWithOtp({
         email,
-        options: { emailRedirectTo: REDIRECT_URL }
+        options: {
+          shouldCreateUser: true
+        }
       });
 
       loginBtnEl.disabled = false;
@@ -550,7 +566,43 @@
         return;
       }
 
-      setStatus(authStatusEl, "Magic Link を送信しました。最新メールのリンクを開いてください。", "success");
+      pendingEmail = email;
+      otpPanelEl.classList.remove("hidden");
+      otpInputEl.focus();
+      setStatus(authStatusEl, "認証コードを送信しました。メール内の6桁コードを入力してください。", "success");
+    }
+
+    async function verifyOtpCode() {
+      const email = emailInputEl.value.trim() || pendingEmail;
+      const token = otpInputEl.value.trim();
+
+      if (!email) {
+        setStatus(authStatusEl, "先にメールアドレスを入力してください。", "error");
+        return;
+      }
+      if (!token || token.length < 6) {
+        setStatus(authStatusEl, "6桁の認証コードを入力してください。", "error");
+        return;
+      }
+
+      verifyBtnEl.disabled = true;
+      setStatus(authStatusEl, "認証中...", "");
+
+      const { error } = await supabase.auth.verifyOtp({
+        email,
+        token,
+        type: "email"
+      });
+
+      verifyBtnEl.disabled = false;
+
+      if (error) {
+        setStatus(authStatusEl, "認証に失敗しました: " + error.message, "error");
+        return;
+      }
+
+      setStatus(authStatusEl, "ログインしました。", "success");
+      await handleSession();
     }
 
     async function verifyMembershipAndLoadItems(user) {
@@ -711,11 +763,6 @@
         return;
       }
 
-      if (session.user.id !== EXPECTED_USER_ID) {
-        showLoggedOut();
-        setStatus(authStatusEl, "この画面は現在、指定したユーザーIDのみ利用できます。", "error");
-        return;
-      }
 
       showLoggedIn(session.user);
       await verifyMembershipAndLoadItems(session.user);
@@ -735,9 +782,13 @@
         closeAccountMenu();
       });
 
-      loginBtnEl.addEventListener("click", sendMagicLink);
+      loginBtnEl.addEventListener("click", sendOtpCode);
       emailInputEl.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") sendMagicLink();
+        if (event.key === "Enter") sendOtpCode();
+      });
+      verifyBtnEl.addEventListener("click", verifyOtpCode);
+      otpInputEl.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") verifyOtpCode();
       });
 
       addBtnEl.addEventListener("click", addItem);
@@ -760,6 +811,7 @@
           setStatus(itemStatusEl, "ログアウトに失敗しました: " + error.message, "error");
           return;
         }
+        otpInputEl.value = "";
         showLoggedOut();
         setStatus(authStatusEl, "ログアウトしました。", "success");
       });
