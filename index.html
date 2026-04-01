@@ -358,7 +358,7 @@
 
     <section id="authPanel" class="panel">
       <h2 class="panel-title">ログイン</h2>
-      <p class="panel-text">初回のみメール認証してください。メールで受け取った6桁コードをこの画面に入力できます。</p>
+      <p class="panel-text">初回のみメール認証してください。メールで受け取った8桁コードをこの画面に入力できます。</p>
 
       <div class="form-group">
         <label for="emailInput">メールアドレス</label>
@@ -370,7 +370,7 @@
       <div id="otpPanel" class="hidden">
         <div class="form-group" style="margin-top: 12px;">
           <label for="otpInput">認証コード</label>
-          <input id="otpInput" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="6桁コード" maxlength="6" />
+          <input id="otpInput" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="8桁コード" maxlength="8" />
         </div>
         <button id="verifyBtn" class="verify-btn" type="button">コードを確認してログイン</button>
       </div>
@@ -570,7 +570,7 @@
       pendingEmail = email;
       otpPanelEl.classList.remove("hidden");
       otpInputEl.focus();
-      setStatus(authStatusEl, "認証コードを送信しました。メール内の6桁コードを入力してください。", "success");
+      setStatus(authStatusEl, "認証コードを送信しました。メール内の8桁コードを入力してください。", "success");
     }
 
     async function verifyOtpCode() {
@@ -581,8 +581,8 @@
         setStatus(authStatusEl, "先にメールアドレスを入力してください。", "error");
         return;
       }
-      if (!token || token.length < 6) {
-        setStatus(authStatusEl, "6桁の認証コードを入力してください。", "error");
+      if (!token || token.length < 8) {
+        setStatus(authStatusEl, "8桁の認証コードを入力してください。", "error");
         return;
       }
 
