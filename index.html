@@ -551,7 +551,7 @@
       loginBtnEl.disabled = true;
       setStatus(authStatusEl, "認証コードを送信中...", "");
 
-      const { error } = await supabase.auth.signInWithOtp({
+      const { error } = await supabase.auth.verifyOtp({
         email,
         options: {
           shouldCreateUser: true
