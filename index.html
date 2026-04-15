@@ -5,20 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ふたりの未来リスト</title>
   <style>
-    * { box-sizing: border-box; }
     :root {
-      --bg: #f7f7f7;
-      --surface: #fff;
-      --text: #222;
-      --muted: #666;
+      --bg: #f6f7fb;
+      --surface: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
       --line: #e5e7eb;
-      --soft: #f0f0f0;
-      --primary: #222;
-      --danger: #e53935;
-      --success: #2e7d32;
-      --blue: #2563eb;
-      --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --primary: #111827;
+      --primary-soft: #eef2ff;
+      --accent: #2563eb;
+      --danger: #dc2626;
+      --success: #059669;
+      --warning: #d97706;
+      --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
     }
+
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -27,330 +30,43 @@
       color: var(--text);
     }
 
-    .app-shell {
-      max-width: 720px;
-      margin: 0 auto;
-      min-height: 100vh;
-      padding: 20px 16px 96px;
+    button, input, select, textarea {
+      font: inherit;
     }
 
-    .header-bar {
+    .app {
+      max-width: 760px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding-bottom: 96px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(246, 247, 251, 0.92);
+      backdrop-filter: blur(10px);
+      padding: 16px 16px 10px;
+    }
+
+    .topbar-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 20px;
     }
 
-    .title-wrap h1 {
+    h1 {
       margin: 0;
-      font-size: 28px;
+      font-size: 26px;
       line-height: 1.2;
     }
 
-    .title-wrap p {
-      margin: 6px 0 0;
-      color: var(--muted);
+    .subtitle {
+      margin-top: 6px;
       font-size: 13px;
-      line-height: 1.5;
-    }
-
-    .panel,
-    .form,
-    .empty,
-    .confirm-box,
-    .summary-box,
-    .card,
-    .account-btn,
-    .account-menu,
-    .nav-bar,
-    .sheet {
-      background: var(--surface);
-      border-radius: 16px;
-      box-shadow: var(--shadow);
-    }
-
-    .panel,
-    .form,
-    .sheet {
-      padding: 16px;
-      margin-bottom: 20px;
-    }
-
-    .panel-title {
-      margin: 0 0 12px;
-      font-size: 18px;
-      font-weight: 700;
-    }
-
-    .panel-text,
-    .sub-note,
-    .status-note {
-      font-size: 14px;
-      color: #555;
-      line-height: 1.6;
-      margin: 0 0 12px;
-    }
-
-    .hidden { display: none !important; }
-
-    .screen { display: none; }
-    .screen.active { display: block; }
-
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .summary-box {
-      padding: 14px;
-    }
-
-    .summary-label {
-      font-size: 12px;
       color: var(--muted);
-      margin-bottom: 6px;
-    }
-
-    .summary-value {
-      font-size: 24px;
-      font-weight: 700;
-    }
-
-    .section-title {
-      margin: 0 0 10px;
-      font-size: 17px;
-      font-weight: 700;
-    }
-
-    .card {
-      padding: 14px;
-      margin-bottom: 14px;
-    }
-
-    .card:last-child { margin-bottom: 0; }
-
-    .card-title {
-      margin: 0 0 10px;
-      font-size: 18px;
-      line-height: 1.4;
-      word-break: break-word;
-    }
-
-    .category-badge,
-    .pill {
-      display: inline-block;
-      margin: 0 6px 8px 0;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: var(--soft);
-      font-size: 12px;
-      font-weight: 700;
-      color: #333;
-    }
-
-    .pill.primary {
-      background: #eef2ff;
-      color: #3730a3;
-    }
-
-    .url {
-      display: block;
-      font-size: 14px;
-      color: var(--blue);
-      text-decoration: none;
-      word-break: break-all;
-      margin-bottom: 12px;
-    }
-
-    .url:hover { text-decoration: underline; }
-
-    .muted {
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.6;
-      margin: 0 0 12px;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .form-group {
-      margin-bottom: 12px;
-    }
-
-    .form-group:last-child {
-      margin-bottom: 0;
-    }
-
-    label {
-      display: block;
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
-
-    input[type="text"],
-    input[type="url"],
-    input[type="email"],
-    select,
-    textarea {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #d9d9d9;
-      border-radius: 10px;
-      font-size: 16px;
-      background: #fff;
-      font-family: inherit;
-    }
-
-    textarea {
-      min-height: 92px;
-      resize: vertical;
-    }
-
-    input:focus,
-    select:focus,
-    textarea:focus {
-      outline: none;
-      border-color: #888;
-    }
-
-    button {
-      border: none;
-      border-radius: 10px;
-      padding: 12px 14px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .primary-btn,
-    .add-btn,
-    .login-btn,
-    .verify-btn,
-    .toggle-btn,
-    .edit-btn,
-    .nav-btn.active {
-      background: var(--primary);
-      color: #fff;
-    }
-
-    .reload-btn,
-    .cancel-btn,
-    .secondary-btn,
-    .tab-btn,
-    .nav-btn {
-      background: #e0e0e0;
-      color: #333;
-    }
-
-    .logout-btn,
-    .delete-btn,
-    .danger-btn {
-      background: var(--danger);
-      color: #fff;
-    }
-
-    .add-btn,
-    .login-btn,
-    .verify-btn {
-      width: 100%;
-      font-size: 16px;
-    }
-
-    .form-actions {
-      display: grid;
-      gap: 10px;
-    }
-
-    .status {
-      margin-top: 10px;
-      font-size: 13px;
-      line-height: 1.5;
-      color: #444;
-      min-height: 1.4em;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .status.error { color: #c62828; }
-    .status.success { color: var(--success); }
-
-    .tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-    }
-
-    .tab-btn {
-      border-radius: 999px;
-      padding: 10px 14px;
-      font-size: 14px;
-    }
-
-    .tab-btn.active {
-      background: var(--primary);
-      color: #fff;
-    }
-
-    .list {
-      display: grid;
-      gap: 14px;
-    }
-
-    .actions {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-      flex-wrap: wrap;
-    }
-
-    .empty {
-      text-align: center;
-      color: var(--muted);
-      padding: 28px 12px;
-    }
-
-    .confirm-modal,
-    .sheet-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.45);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      padding: 16px;
-    }
-
-    .confirm-modal.hidden,
-    .sheet-backdrop.hidden {
-      display: none !important;
-    }
-
-    .confirm-box,
-    .sheet {
-      width: min(92vw, 420px);
-    }
-
-    .confirm-box {
-      padding: 20px;
-      text-align: center;
-    }
-
-    .confirm-text {
-      margin: 0 0 16px;
-      font-size: 16px;
-      line-height: 1.5;
-    }
-
-    .confirm-actions {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
     }
 
     .account-wrap {
@@ -362,11 +78,13 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      border: none;
       padding: 10px 12px;
-      max-width: 190px;
-      font-size: 12px;
-      font-weight: 700;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      max-width: 220px;
     }
 
     .account-dot {
@@ -378,63 +96,320 @@
     }
 
     .account-dot.logged-in {
-      background: #16a34a;
+      background: var(--success);
     }
 
     .account-label {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      font-size: 12px;
+      font-weight: 700;
     }
 
     .account-menu {
       position: absolute;
       top: calc(100% + 8px);
       right: 0;
-      width: min(280px, 80vw);
+      width: min(320px, 82vw);
       padding: 14px;
-      z-index: 1000;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
     }
+
+    .hidden { display: none !important; }
 
     .account-email {
-      font-size: 13px;
-      color: #555;
-      line-height: 1.5;
-      word-break: break-all;
-      margin-bottom: 12px;
       white-space: pre-wrap;
+      word-break: break-all;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 12px;
+      line-height: 1.5;
     }
 
-    .account-actions {
+    .stack-sm { display: grid; gap: 8px; }
+
+    .content {
+      padding: 10px 16px 0;
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .card,
+    .panel,
+    .empty-state,
+    .modal-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .panel {
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      margin: 0 0 12px;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .section-note {
+      margin: -2px 0 12px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .summary-grid {
       display: grid;
-      gap: 8px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
     }
 
-    .account-actions button { width: 100%; }
+    .summary-box {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fafafa;
+    }
 
-    .nav-bar {
+    .summary-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .summary-value {
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    .summary-sub {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .tab-btn,
+    .secondary-btn,
+    .danger-btn,
+    .primary-btn,
+    .ghost-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .tab-btn {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .primary-btn {
+      width: 100%;
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .secondary-btn,
+    .ghost-btn {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    .danger-btn {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .form-group {
+      display: grid;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    input[type="text"],
+    input[type="url"],
+    input[type="email"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px 13px;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      background: #fff;
+      color: var(--text);
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .inline-actions,
+    .card-actions,
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .inline-actions > button,
+    .card-actions > button,
+    .modal-actions > button {
+      flex: 1 1 140px;
+    }
+
+    .status {
+      min-height: 1.4em;
+      margin-top: 10px;
+      font-size: 13px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .status.error { color: var(--danger); }
+    .status.success { color: var(--success); }
+    .status.warning { color: var(--warning); }
+
+    .list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .card {
+      padding: 14px;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    .pill.primary {
+      background: var(--primary-soft);
+      color: #3730a3;
+    }
+
+    .card-title {
+      margin: 0 0 8px;
+      font-size: 18px;
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    .card-text {
+      margin: 0 0 12px;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .card-link {
+      display: block;
+      margin: 0 0 12px;
+      font-size: 14px;
+      color: var(--accent);
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    .card-link:hover {
+      text-decoration: underline;
+    }
+
+    .empty-state {
+      padding: 28px 16px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .bottom-nav {
       position: fixed;
       left: 50%;
+      bottom: 0;
       transform: translateX(-50%);
-      bottom: 14px;
-      width: min(720px - 32px, calc(100vw - 24px));
+      width: min(760px, 100%);
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      padding: 8px;
-      z-index: 200;
-      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--line);
+      z-index: 30;
     }
 
     .nav-btn {
-      min-height: 56px;
-      border-radius: 14px;
+      border: none;
+      background: transparent;
+      padding: 10px 4px 12px;
+      font-size: 12px;
+      color: var(--muted);
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
       gap: 4px;
-      font-size: 12px;
+      align-items: center;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .nav-btn.active {
+      color: var(--primary);
     }
 
     .nav-icon {
@@ -444,330 +419,405 @@
 
     .fab {
       position: fixed;
-      right: max(18px, calc((100vw - 720px) / 2 + 18px));
-      bottom: 92px;
+      left: 50%;
+      bottom: 74px;
+      transform: translateX(min(320px, 42vw));
       width: 58px;
       height: 58px;
+      border: none;
       border-radius: 50%;
-      font-size: 28px;
       background: var(--primary);
       color: #fff;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-      z-index: 210;
+      font-size: 28px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      z-index: 40;
     }
 
-    .sheet-title {
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 50;
+    }
+
+    .modal-card {
+      width: min(420px, 100%);
+      padding: 18px;
+    }
+
+    .modal-title {
       margin: 0 0 8px;
-      font-size: 18px;
-      font-weight: 700;
+      font-size: 19px;
+      font-weight: 800;
     }
 
-    .sheet p {
-      margin: 0 0 16px;
+    .modal-note {
+      margin: 0 0 14px;
       font-size: 14px;
-      color: #555;
+      color: var(--muted);
       line-height: 1.6;
     }
 
-    .sheet-actions {
-      display: grid;
-      gap: 10px;
-    }
-
-    .sheet-actions button {
-      text-align: left;
+    .action-choice {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 16px;
       padding: 14px;
-      border-radius: 12px;
-      border: none;
-      background: var(--soft);
-      color: var(--text);
+      text-align: left;
+      cursor: pointer;
+      margin-bottom: 10px;
     }
 
-    .sheet-actions strong {
+    .action-choice strong {
       display: block;
       margin-bottom: 4px;
-      font-size: 14px;
+      font-size: 15px;
     }
 
-    .sheet-actions span {
-      display: block;
+    .action-choice span {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .auth-only {
+      max-width: 560px;
+      margin: 26px auto 0;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--line);
+      margin: 14px 0;
+    }
+
+    .small-note {
       font-size: 12px;
       color: var(--muted);
       line-height: 1.5;
     }
 
-    .inline-status {
-      margin-top: -4px;
-      margin-bottom: 12px;
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-
-    @media (max-width: 480px) {
-      .app-shell { padding-left: 12px; padding-right: 12px; }
-      .title-wrap h1 { font-size: 24px; }
+    @media (max-width: 560px) {
+      h1 { font-size: 23px; }
       .summary-grid { grid-template-columns: 1fr 1fr; }
-      .actions, .confirm-actions { flex-direction: column; }
-      .delete-btn, .toggle-btn, .edit-btn, .confirm-actions button { width: 100%; }
-      .account-btn { max-width: 120px; }
-      .nav-bar { width: calc(100vw - 16px); bottom: 8px; }
-      .fab { right: 14px; }
+      .fab { transform: translateX(calc(50vw - 86px)); }
+      .topbar { padding-inline: 12px; }
+      .content { padding-inline: 12px; }
+      .account-btn { max-width: 135px; }
     }
   </style>
 </head>
 <body>
-  <div class="app-shell">
-    <div class="header-bar">
-      <div class="title-wrap">
-        <h1>ふたりの未来リスト</h1>
-        <p>行きたい場所とライフプランを1つで管理</p>
-      </div>
-      <div class="account-wrap">
-        <button id="accountBtn" class="account-btn hidden" type="button" aria-label="アカウントメニュー">
-          <span id="accountDot" class="account-dot"></span>
-          <span id="accountLabel" class="account-label">未ログイン</span>
-        </button>
-        <div id="accountMenu" class="account-menu hidden">
-          <div id="accountEmail" class="account-email">ログインしていません</div>
-          <div class="account-actions">
-            <button id="reloadBtn" class="reload-btn" type="button">再読み込み</button>
-            <button id="logoutBtn" class="logout-btn" type="button">ログアウト</button>
+  <div class="app">
+    <header class="topbar">
+      <div class="topbar-row">
+        <div>
+          <h1>ふたりの未来リスト</h1>
+          <div class="subtitle">行きたい場所とライフプランをまとめて管理</div>
+        </div>
+        <div class="account-wrap">
+          <button id="accountBtn" class="account-btn hidden" type="button" aria-label="アカウントメニューを開く">
+            <span id="accountDot" class="account-dot"></span>
+            <span id="accountLabel" class="account-label">未ログイン</span>
+          </button>
+          <div id="accountMenu" class="account-menu hidden">
+            <div id="accountEmail" class="account-email">ログインしていません</div>
+            <div class="stack-sm">
+              <button id="reloadBtn" class="secondary-btn" type="button">Supabaseから再読み込み</button>
+              <button id="logoutBtn" class="danger-btn" type="button">ログアウト</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </header>
 
-    <section id="authPanel" class="panel">
-      <h2 class="panel-title">ログイン</h2>
-      <p class="panel-text">既存の共有リスト認証をそのまま使います。初回のみメール認証してください。</p>
-      <div class="form-group">
-        <label for="emailInput">メールアドレス</label>
-        <input id="emailInput" type="email" placeholder="example@example.com" />
-      </div>
-      <button id="loginBtn" class="login-btn" type="button">認証コードを送信</button>
-      <div id="otpPanel" class="hidden">
-        <div class="form-group" style="margin-top: 12px;">
-          <label for="otpInput">認証コード</label>
-          <input id="otpInput" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="8桁コード" maxlength="8" />
-        </div>
-        <button id="verifyBtn" class="verify-btn" type="button">コードを確認してログイン</button>
-      </div>
-      <div id="authStatus" class="status"></div>
-    </section>
-
-    <section id="appPanel" class="hidden">
-      <section id="screen-home" class="screen active">
-        <div class="summary-grid">
-          <div class="summary-box">
-            <div class="summary-label">行きたい場所</div>
-            <div id="summaryPlacesWant" class="summary-value">0</div>
+    <main class="content">
+      <section id="authPanel" class="panel auth-only">
+        <h2 class="section-title">ログイン</h2>
+        <p class="section-note">メール認証でログインします。受け取ったコードを入力してください。</p>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="emailInput">メールアドレス</label>
+            <input id="emailInput" type="email" placeholder="example@example.com" />
           </div>
-          <div class="summary-box">
-            <div class="summary-label">共通の目標</div>
-            <div id="summarySharedPlans" class="summary-value">0</div>
-          </div>
-          <div class="summary-box">
-            <div class="summary-label">行った場所</div>
-            <div id="summaryPlacesDone" class="summary-value">0</div>
-          </div>
-          <div class="summary-box">
-            <div class="summary-label">進行中の計画</div>
-            <div id="summaryInProgressPlans" class="summary-value">0</div>
+          <button id="loginBtn" class="primary-btn" type="button">認証コードを送信</button>
+          <div id="otpPanel" class="hidden">
+            <div class="form-group">
+              <label for="otpInput">認証コード</label>
+              <input id="otpInput" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="8桁コード" maxlength="8" />
+            </div>
+            <button id="verifyBtn" class="primary-btn" type="button">コードを確認してログイン</button>
           </div>
         </div>
-
-        <section class="panel">
-          <h2 class="section-title">直近で見たい項目</h2>
-          <div id="homeHighlights"></div>
-        </section>
-
-        <section class="panel">
-          <h2 class="section-title">このアプリの状態</h2>
-          <p id="lifePlanModeNote" class="status-note">ライフプラン保存方式を確認中...</p>
-          <p class="status-note">行きたいリストは既存どおり Supabase を利用します。</p>
-        </section>
+        <div id="authStatus" class="status"></div>
       </section>
 
-      <section id="screen-places" class="screen">
-        <section class="form">
-          <h2 id="placeFormTitle" class="panel-title">行きたい場所を追加</h2>
-          <div class="form-group">
-            <label for="shopName">店名・場所名</label>
-            <input id="shopName" type="text" placeholder="例：焼肉〇〇 / 箱根 / 京都ホテル" />
+      <section id="appPanel" class="hidden">
+        <section id="screen-home" class="screen active">
+          <div class="summary-grid">
+            <div class="summary-box">
+              <div class="summary-label">行きたい場所</div>
+              <div id="summaryWant" class="summary-value">0</div>
+              <div class="summary-sub">未訪問の件数</div>
+            </div>
+            <div class="summary-box">
+              <div class="summary-label">行った場所</div>
+              <div id="summaryDone" class="summary-value">0</div>
+              <div class="summary-sub">訪問済みの件数</div>
+            </div>
+            <div class="summary-box">
+              <div class="summary-label">共通の目標</div>
+              <div id="summaryShared" class="summary-value">0</div>
+              <div class="summary-sub">ライフプラン内</div>
+            </div>
+            <div class="summary-box">
+              <div class="summary-label">進行中の計画</div>
+              <div id="summaryActive" class="summary-value">0</div>
+              <div class="summary-sub">status = active</div>
+            </div>
           </div>
-          <div class="form-group">
-            <label for="shopUrl">URL</label>
-            <input id="shopUrl" type="url" placeholder="https://example.com" />
-          </div>
-          <div class="form-group">
-            <label for="shopCategory">カテゴリ</label>
-            <select id="shopCategory">
-              <option value="食">食</option>
-              <option value="旅行">旅行</option>
-            </select>
-          </div>
-          <div class="form-actions">
-            <button class="add-btn" id="saveBtn" type="button">追加する</button>
-            <button class="cancel-btn hidden" id="cancelEditBtn" type="button">編集をキャンセル</button>
-          </div>
-          <div class="sub-note">保存先は Supabase です。既存の共有リストを維持します。</div>
-          <div id="itemStatus" class="status"></div>
+
+          <section class="panel">
+            <h2 class="section-title">最近追加した行きたい場所</h2>
+            <div id="homePlaces" class="list"></div>
+          </section>
+
+          <section class="panel">
+            <h2 class="section-title">優先して見たいライフプラン</h2>
+            <div id="homePlans" class="list"></div>
+          </section>
         </section>
 
-        <div class="tabs">
-          <button id="tabAllCategory" class="tab-btn active" type="button">すべて</button>
-          <button id="tabFood" class="tab-btn" type="button">食</button>
-          <button id="tabTravel" class="tab-btn" type="button">旅行</button>
-        </div>
+        <section id="screen-places" class="screen">
+          <section class="panel">
+            <h2 id="placeFormTitle" class="section-title">行きたい場所を追加</h2>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="placeNameInput">店名・場所名</label>
+                <input id="placeNameInput" type="text" placeholder="例：神楽坂のイタリアン" />
+              </div>
+              <div class="form-group">
+                <label for="placeUrlInput">URL</label>
+                <input id="placeUrlInput" type="url" placeholder="https://example.com" />
+              </div>
+              <div class="form-group">
+                <label for="placeCategoryInput">カテゴリ</label>
+                <select id="placeCategoryInput">
+                  <option value="食">食</option>
+                  <option value="旅行">旅行</option>
+                </select>
+              </div>
+              <div class="inline-actions">
+                <button id="savePlaceBtn" class="primary-btn" type="button">追加する</button>
+                <button id="cancelPlaceEditBtn" class="secondary-btn hidden" type="button">編集をキャンセル</button>
+              </div>
+            </div>
+            <div class="small-note">保存先は Supabase の items テーブルです。</div>
+            <div id="placeStatus" class="status"></div>
+          </section>
 
-        <div class="tabs">
-          <button id="tabWant" class="tab-btn active" type="button">行きたい</button>
-          <button id="tabDone" class="tab-btn" type="button">行った</button>
-        </div>
+          <div class="tabs">
+            <button class="tab-btn active" id="placeCategoryAllBtn" type="button">すべて</button>
+            <button class="tab-btn" id="placeCategoryFoodBtn" type="button">食</button>
+            <button class="tab-btn" id="placeCategoryTravelBtn" type="button">旅行</button>
+          </div>
 
-        <section id="list" class="list"></section>
-      </section>
+          <div class="tabs">
+            <button class="tab-btn active" id="placeVisitWantBtn" type="button">行きたい</button>
+            <button class="tab-btn" id="placeVisitDoneBtn" type="button">行った</button>
+          </div>
 
-      <section id="screen-life" class="screen">
-        <section class="form">
-          <h2 id="lifeFormTitle" class="panel-title">ライフプランを追加</h2>
-          <div id="lifePlanStorageNote" class="inline-status">保存方式を確認中...</div>
-          <div class="form-group">
-            <label for="lifeTitle">やりたいこと</label>
-            <input id="lifeTitle" type="text" placeholder="例：30代でヨーロッパ旅行 / 同棲の準備を進める" />
-          </div>
-          <div class="form-group">
-            <label for="lifeAgeGroup">年代</label>
-            <select id="lifeAgeGroup">
-              <option value="20代">20代</option>
-              <option value="30代">30代</option>
-              <option value="40代">40代</option>
-              <option value="50代+">50代+</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="lifeCategory">カテゴリ</label>
-            <select id="lifeCategory">
-              <option value="旅行">旅行</option>
-              <option value="暮らし">暮らし</option>
-              <option value="家族">家族</option>
-              <option value="仕事">仕事</option>
-              <option value="お金">お金</option>
-              <option value="その他">その他</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="lifeOwnerType">対象</label>
-            <select id="lifeOwnerType">
-              <option value="共通">共通</option>
-              <option value="自分">自分</option>
-              <option value="彼女">彼女</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="lifeStatus">状態</label>
-            <select id="lifeStatus">
-              <option value="いつか">いつか</option>
-              <option value="検討中">検討中</option>
-              <option value="進行中">進行中</option>
-              <option value="達成">達成</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="lifeMemo">メモ</label>
-            <textarea id="lifeMemo" placeholder="補足メモ、条件、話し合いたいこと"></textarea>
-          </div>
-          <div class="form-actions">
-            <button class="add-btn" id="saveLifeBtn" type="button">追加する</button>
-            <button class="cancel-btn hidden" id="cancelLifeEditBtn" type="button">編集をキャンセル</button>
-          </div>
-          <div id="lifeStatusMsg" class="status"></div>
+          <section id="placesList" class="list"></section>
         </section>
 
-        <div class="tabs">
-          <button class="tab-btn active" id="lifeAgeAll" type="button">すべて</button>
-          <button class="tab-btn" id="lifeAge20" type="button">20代</button>
-          <button class="tab-btn" id="lifeAge30" type="button">30代</button>
-          <button class="tab-btn" id="lifeAge40" type="button">40代</button>
-          <button class="tab-btn" id="lifeAge50" type="button">50代+</button>
-        </div>
+        <section id="screen-plans" class="screen">
+          <section class="panel">
+            <h2 id="planFormTitle" class="section-title">ライフプランを追加</h2>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="planTitleInput">やりたいこと</label>
+                <input id="planTitleInput" type="text" placeholder="例：30代でヨーロッパ旅行" />
+              </div>
+              <div class="form-group">
+                <label for="planAgeInput">年代</label>
+                <select id="planAgeInput">
+                  <option value="20代">20代</option>
+                  <option value="30代">30代</option>
+                  <option value="40代">40代</option>
+                  <option value="50代">50代</option>
+                  <option value="60代+">60代+</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="planCategoryInput">カテゴリ</label>
+                <select id="planCategoryInput">
+                  <option value="旅行">旅行</option>
+                  <option value="暮らし">暮らし</option>
+                  <option value="家族">家族</option>
+                  <option value="仕事">仕事</option>
+                  <option value="お金">お金</option>
+                  <option value="健康">健康</option>
+                  <option value="趣味">趣味</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="planOwnerInput">対象</label>
+                <select id="planOwnerInput">
+                  <option value="shared">共通</option>
+                  <option value="male">彼氏</option>
+                  <option value="female">彼女</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="planStatusInput">状態</label>
+                <select id="planStatusInput">
+                  <option value="idea">いつか</option>
+                  <option value="planning">検討中</option>
+                  <option value="active">進行中</option>
+                  <option value="done">達成</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="planPriorityInput">優先度</label>
+                <select id="planPriorityInput">
+                  <option value="3">高</option>
+                  <option value="2" selected>中</option>
+                  <option value="1">低</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="planNoteInput">メモ</label>
+                <textarea id="planNoteInput" placeholder="背景や補足をメモ"></textarea>
+              </div>
+              <div class="inline-actions">
+                <button id="savePlanBtn" class="primary-btn" type="button">追加する</button>
+                <button id="cancelPlanEditBtn" class="secondary-btn hidden" type="button">編集をキャンセル</button>
+              </div>
+            </div>
+            <div class="small-note">保存先は Supabase の life_plans テーブルです。</div>
+            <div id="planStatus" class="status"></div>
+          </section>
 
-        <div class="tabs">
-          <button class="tab-btn active" id="lifeOwnerAll" type="button">すべて</button>
-          <button class="tab-btn" id="lifeOwnerSelf" type="button">自分</button>
-          <button class="tab-btn" id="lifeOwnerPartner" type="button">彼女</button>
-          <button class="tab-btn" id="lifeOwnerShared" type="button">共通</button>
-        </div>
-
-        <section id="lifeList" class="list"></section>
-      </section>
-
-      <section id="screen-settings" class="screen">
-        <section class="panel">
-          <h2 class="section-title">設定</h2>
-          <p class="panel-text">この更新版では、既存の認証と行きたいリストを維持したまま、ライフプラン画面を追加しています。</p>
-          <div class="card">
-            <div class="card-title">今回の更新内容</div>
-            <div class="pill">ホーム追加</div>
-            <div class="pill">下部ナビ追加</div>
-            <div class="pill">ライフプラン追加</div>
-            <div class="pill">追加導線分離</div>
-            <p class="muted">将来的に Supabase 側へ life_plans テーブルを作れば、ライフプランも共有保存に切り替えできます。</p>
+          <div class="tabs">
+            <button class="tab-btn active" data-age-filter="all" type="button">すべて</button>
+            <button class="tab-btn" data-age-filter="20代" type="button">20代</button>
+            <button class="tab-btn" data-age-filter="30代" type="button">30代</button>
+            <button class="tab-btn" data-age-filter="40代" type="button">40代</button>
+            <button class="tab-btn" data-age-filter="50代" type="button">50代</button>
+            <button class="tab-btn" data-age-filter="60代+" type="button">60代+</button>
           </div>
+
+          <div class="tabs">
+            <button class="tab-btn active" data-owner-filter="all" type="button">すべて</button>
+            <button class="tab-btn" data-owner-filter="shared" type="button">共通</button>
+            <button class="tab-btn" data-owner-filter="male" type="button">彼氏</button>
+            <button class="tab-btn" data-owner-filter="female" type="button">彼女</button>
+          </div>
+
+          <section id="plansList" class="list"></section>
+        </section>
+
+        <section id="screen-settings" class="screen">
+          <section class="panel">
+            <h2 class="section-title">設定と確認</h2>
+            <p class="section-note">この画面は、状態確認・再読み込み・移動のために使います。</p>
+
+            <div class="summary-grid">
+              <div class="summary-box">
+                <div class="summary-label">items件数</div>
+                <div id="settingsItemsCount" class="summary-value">0</div>
+                <div class="summary-sub">行きたいリスト</div>
+              </div>
+              <div class="summary-box">
+                <div class="summary-label">life_plans件数</div>
+                <div id="settingsPlansCount" class="summary-value">0</div>
+                <div class="summary-sub">ライフプラン</div>
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label>ログイン中のメール</label>
+                <input id="settingsEmail" type="text" readonly />
+              </div>
+              <div class="form-group">
+                <label>共有リストID</label>
+                <input id="settingsListId" type="text" readonly />
+              </div>
+              <div class="form-group">
+                <label>保存先</label>
+                <input id="settingsStorage" type="text" readonly />
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="inline-actions">
+              <button id="settingsReloadBtn" class="primary-btn" type="button">Supabaseから再読み込み</button>
+              <button id="settingsGoHomeBtn" class="secondary-btn" type="button">ホームを開く</button>
+              <button id="settingsGoPlacesBtn" class="secondary-btn" type="button">行きたいを開く</button>
+              <button id="settingsGoPlansBtn" class="secondary-btn" type="button">ライフプランを開く</button>
+            </div>
+
+            <div id="settingsStatus" class="status"></div>
+          </section>
         </section>
       </section>
-    </section>
+    </main>
+
+    <button id="fab" class="fab hidden" type="button" aria-label="追加する">＋</button>
+
+    <nav id="bottomNav" class="bottom-nav hidden">
+      <button class="nav-btn active" data-screen="home" type="button">
+        <span class="nav-icon">⌂</span>
+        <span>ホーム</span>
+      </button>
+      <button class="nav-btn" data-screen="places" type="button">
+        <span class="nav-icon">📍</span>
+        <span>行きたい</span>
+      </button>
+      <button class="nav-btn" data-screen="plans" type="button">
+        <span class="nav-icon">🗂</span>
+        <span>ライフプラン</span>
+      </button>
+      <button class="nav-btn" data-screen="settings" type="button">
+        <span class="nav-icon">⚙</span>
+        <span>設定</span>
+      </button>
+    </nav>
   </div>
 
-  <button id="fab" class="fab hidden" type="button" aria-label="追加">＋</button>
-
-  <nav id="navBar" class="nav-bar hidden">
-    <button class="nav-btn active" data-screen="home" type="button">
-      <span class="nav-icon">⌂</span>
-      <span>ホーム</span>
-    </button>
-    <button class="nav-btn" data-screen="places" type="button">
-      <span class="nav-icon">📍</span>
-      <span>行きたい</span>
-    </button>
-    <button class="nav-btn" data-screen="life" type="button">
-      <span class="nav-icon">🗂</span>
-      <span>ライフプラン</span>
-    </button>
-    <button class="nav-btn" data-screen="settings" type="button">
-      <span class="nav-icon">⚙</span>
-      <span>設定</span>
-    </button>
-  </nav>
-
-  <div id="actionSheetBackdrop" class="sheet-backdrop hidden">
-    <div class="sheet">
-      <h3 class="sheet-title">追加する内容を選択</h3>
-      <p>性質が違うため、追加フォームを分けています。</p>
-      <div class="sheet-actions">
-        <button id="openPlaceFormBtn" type="button">
-          <strong>行きたい場所を追加</strong>
-          <span>店・スポット・旅行先を追加</span>
-        </button>
-        <button id="openLifeFormBtn" type="button">
-          <strong>ライフプランを追加</strong>
-          <span>年代ごとの目標・将来計画を追加</span>
-        </button>
-        <button id="closeActionSheetBtn" type="button">
-          <strong>閉じる</strong>
-          <span>この画面を閉じます</span>
-        </button>
+  <div id="fabModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <h3 class="modal-title">追加する内容を選択</h3>
+      <p class="modal-note">項目の性質が違うため、追加フォームは分けています。</p>
+      <button id="openPlaceFormBtn" class="action-choice" type="button">
+        <strong>行きたい場所を追加</strong>
+        <span>店、スポット、旅行先を登録します。</span>
+      </button>
+      <button id="openPlanFormBtn" class="action-choice" type="button">
+        <strong>ライフプランを追加</strong>
+        <span>年代ごとの目標や将来やりたいことを登録します。</span>
+      </button>
+      <div class="modal-actions">
+        <button id="closeFabModalBtn" class="secondary-btn" type="button">閉じる</button>
       </div>
     </div>
   </div>
 
-  <div id="deleteConfirmModal" class="confirm-modal hidden">
-    <div class="confirm-box">
-      <p id="confirmDeleteText" class="confirm-text">この項目を削除していいですか？</p>
-      <div class="confirm-actions">
-        <button id="confirmDeleteYes" class="danger-btn" type="button">はい</button>
-        <button id="confirmDeleteNo" class="secondary-btn" type="button">いいえ</button>
+  <div id="deleteModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <h3 class="modal-title">削除の確認</h3>
+      <p id="deleteModalText" class="modal-note">この項目を削除しますか？</p>
+      <div class="modal-actions">
+        <button id="confirmDeleteBtn" class="danger-btn" type="button">削除する</button>
+        <button id="cancelDeleteBtn" class="secondary-btn" type="button">キャンセル</button>
       </div>
     </div>
   </div>
@@ -775,113 +825,121 @@
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-    const SUPABASE_URL = "https://iivycgqxkxkwtjwstgpl.supabase.co";
+    // ここを書き換えてください
+    const SUPABASE_URL = "YOUR_SUPABASE_URL";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpdnljZ3F4a3hrd3Rqd3N0Z3BsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ4MjkzMDQsImV4cCI6MjA5MDQwNTMwNH0.Pm1G7u-7e8-6SB0xCL1CjntJyqpln5VpT-vRO-0L6pE";
     const SHARED_LIST_ID = "d22a3c77-f232-49cd-84ee-50c5fcee3bef";
-    const LIFE_PLAN_FALLBACK_KEY = "future_life_plans_v1";
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let currentUser = null;
-    let currentScreen = "home";
+    const state = {
+      user: null,
+      currentScreen: "home",
+      places: [],
+      plans: [],
+      placeVisitFilter: "want",
+      placeCategoryFilter: "all",
+      planAgeFilter: "all",
+      planOwnerFilter: "all",
+      editingPlaceId: null,
+      editingPlanId: null,
+      deleteTarget: null,
+      pendingEmail: ""
+    };
 
-    let items = [];
-    let currentTab = "want";
-    let currentCategory = "all";
-    let editingItemId = null;
+    const $ = (id) => document.getElementById(id);
 
-    let lifePlans = [];
-    let lifePlanMode = "checking";
-    let lifeAgeFilter = "all";
-    let lifeOwnerFilter = "all";
-    let editingLifePlanId = null;
+    const els = {
+      authPanel: $("authPanel"),
+      appPanel: $("appPanel"),
+      authStatus: $("authStatus"),
+      emailInput: $("emailInput"),
+      loginBtn: $("loginBtn"),
+      otpPanel: $("otpPanel"),
+      otpInput: $("otpInput"),
+      verifyBtn: $("verifyBtn"),
 
-    let pendingDelete = { type: null, id: null };
-    let pendingEmail = "";
+      accountBtn: $("accountBtn"),
+      accountDot: $("accountDot"),
+      accountLabel: $("accountLabel"),
+      accountMenu: $("accountMenu"),
+      accountEmail: $("accountEmail"),
+      reloadBtn: $("reloadBtn"),
+      logoutBtn: $("logoutBtn"),
 
-    const authPanelEl = document.getElementById("authPanel");
-    const appPanelEl = document.getElementById("appPanel");
-    const navBarEl = document.getElementById("navBar");
-    const fabEl = document.getElementById("fab");
+      fab: $("fab"),
+      bottomNav: $("bottomNav"),
 
-    const emailInputEl = document.getElementById("emailInput");
-    const loginBtnEl = document.getElementById("loginBtn");
-    const otpPanelEl = document.getElementById("otpPanel");
-    const otpInputEl = document.getElementById("otpInput");
-    const verifyBtnEl = document.getElementById("verifyBtn");
-    const authStatusEl = document.getElementById("authStatus");
+      summaryWant: $("summaryWant"),
+      summaryDone: $("summaryDone"),
+      summaryShared: $("summaryShared"),
+      summaryActive: $("summaryActive"),
+      homePlaces: $("homePlaces"),
+      homePlans: $("homePlans"),
 
-    const accountBtnEl = document.getElementById("accountBtn");
-    const accountMenuEl = document.getElementById("accountMenu");
-    const accountDotEl = document.getElementById("accountDot");
-    const accountLabelEl = document.getElementById("accountLabel");
-    const accountEmailEl = document.getElementById("accountEmail");
-    const reloadBtnEl = document.getElementById("reloadBtn");
-    const logoutBtnEl = document.getElementById("logoutBtn");
+      placeFormTitle: $("placeFormTitle"),
+      placeNameInput: $("placeNameInput"),
+      placeUrlInput: $("placeUrlInput"),
+      placeCategoryInput: $("placeCategoryInput"),
+      savePlaceBtn: $("savePlaceBtn"),
+      cancelPlaceEditBtn: $("cancelPlaceEditBtn"),
+      placeStatus: $("placeStatus"),
+      placeCategoryAllBtn: $("placeCategoryAllBtn"),
+      placeCategoryFoodBtn: $("placeCategoryFoodBtn"),
+      placeCategoryTravelBtn: $("placeCategoryTravelBtn"),
+      placeVisitWantBtn: $("placeVisitWantBtn"),
+      placeVisitDoneBtn: $("placeVisitDoneBtn"),
+      placesList: $("placesList"),
 
-    const placeFormTitleEl = document.getElementById("placeFormTitle");
-    const shopNameEl = document.getElementById("shopName");
-    const shopUrlEl = document.getElementById("shopUrl");
-    const shopCategoryEl = document.getElementById("shopCategory");
-    const saveBtnEl = document.getElementById("saveBtn");
-    const cancelEditBtnEl = document.getElementById("cancelEditBtn");
-    const itemStatusEl = document.getElementById("itemStatus");
-    const listEl = document.getElementById("list");
+      planFormTitle: $("planFormTitle"),
+      planTitleInput: $("planTitleInput"),
+      planAgeInput: $("planAgeInput"),
+      planCategoryInput: $("planCategoryInput"),
+      planOwnerInput: $("planOwnerInput"),
+      planStatusInput: $("planStatusInput"),
+      planPriorityInput: $("planPriorityInput"),
+      planNoteInput: $("planNoteInput"),
+      savePlanBtn: $("savePlanBtn"),
+      cancelPlanEditBtn: $("cancelPlanEditBtn"),
+      planStatus: $("planStatus"),
+      plansList: $("plansList"),
 
-    const tabAllCategoryEl = document.getElementById("tabAllCategory");
-    const tabFoodEl = document.getElementById("tabFood");
-    const tabTravelEl = document.getElementById("tabTravel");
-    const tabWantEl = document.getElementById("tabWant");
-    const tabDoneEl = document.getElementById("tabDone");
+      settingsItemsCount: $("settingsItemsCount"),
+      settingsPlansCount: $("settingsPlansCount"),
+      settingsEmail: $("settingsEmail"),
+      settingsListId: $("settingsListId"),
+      settingsStorage: $("settingsStorage"),
+      settingsReloadBtn: $("settingsReloadBtn"),
+      settingsGoHomeBtn: $("settingsGoHomeBtn"),
+      settingsGoPlacesBtn: $("settingsGoPlacesBtn"),
+      settingsGoPlansBtn: $("settingsGoPlansBtn"),
+      settingsStatus: $("settingsStatus"),
 
-    const lifeFormTitleEl = document.getElementById("lifeFormTitle");
-    const lifePlanStorageNoteEl = document.getElementById("lifePlanStorageNote");
-    const lifeTitleEl = document.getElementById("lifeTitle");
-    const lifeAgeGroupEl = document.getElementById("lifeAgeGroup");
-    const lifeCategoryEl = document.getElementById("lifeCategory");
-    const lifeOwnerTypeEl = document.getElementById("lifeOwnerType");
-    const lifeStatusEl = document.getElementById("lifeStatus");
-    const lifeMemoEl = document.getElementById("lifeMemo");
-    const saveLifeBtnEl = document.getElementById("saveLifeBtn");
-    const cancelLifeEditBtnEl = document.getElementById("cancelLifeEditBtn");
-    const lifeStatusMsgEl = document.getElementById("lifeStatusMsg");
-    const lifeListEl = document.getElementById("lifeList");
+      fabModal: $("fabModal"),
+      openPlaceFormBtn: $("openPlaceFormBtn"),
+      openPlanFormBtn: $("openPlanFormBtn"),
+      closeFabModalBtn: $("closeFabModalBtn"),
 
-    const lifeAgeAllEl = document.getElementById("lifeAgeAll");
-    const lifeAge20El = document.getElementById("lifeAge20");
-    const lifeAge30El = document.getElementById("lifeAge30");
-    const lifeAge40El = document.getElementById("lifeAge40");
-    const lifeAge50El = document.getElementById("lifeAge50");
+      deleteModal: $("deleteModal"),
+      deleteModalText: $("deleteModalText"),
+      confirmDeleteBtn: $("confirmDeleteBtn"),
+      cancelDeleteBtn: $("cancelDeleteBtn")
+    };
 
-    const lifeOwnerAllEl = document.getElementById("lifeOwnerAll");
-    const lifeOwnerSelfEl = document.getElementById("lifeOwnerSelf");
-    const lifeOwnerPartnerEl = document.getElementById("lifeOwnerPartner");
-    const lifeOwnerSharedEl = document.getElementById("lifeOwnerShared");
+    const screenEls = {
+      home: $("screen-home"),
+      places: $("screen-places"),
+      plans: $("screen-plans"),
+      settings: $("screen-settings")
+    };
 
-    const summaryPlacesWantEl = document.getElementById("summaryPlacesWant");
-    const summarySharedPlansEl = document.getElementById("summarySharedPlans");
-    const summaryPlacesDoneEl = document.getElementById("summaryPlacesDone");
-    const summaryInProgressPlansEl = document.getElementById("summaryInProgressPlans");
-    const homeHighlightsEl = document.getElementById("homeHighlights");
-    const lifePlanModeNoteEl = document.getElementById("lifePlanModeNote");
-
-    const actionSheetBackdropEl = document.getElementById("actionSheetBackdrop");
-    const openPlaceFormBtnEl = document.getElementById("openPlaceFormBtn");
-    const openLifeFormBtnEl = document.getElementById("openLifeFormBtn");
-    const closeActionSheetBtnEl = document.getElementById("closeActionSheetBtn");
-
-    const deleteConfirmModalEl = document.getElementById("deleteConfirmModal");
-    const confirmDeleteTextEl = document.getElementById("confirmDeleteText");
-    const confirmDeleteYesEl = document.getElementById("confirmDeleteYes");
-    const confirmDeleteNoEl = document.getElementById("confirmDeleteNo");
-
-    function setStatus(el, message, type = "") {
-      el.textContent = message || "";
-      el.className = "status" + (type ? " " + type : "");
+    function setStatus(el, message = "", type = "") {
+      el.textContent = message;
+      el.className = "status" + (type ? ` ${type}` : "");
     }
 
-    function escapeHtml(str) {
-      return String(str)
+    function escapeHtml(value) {
+      return String(value ?? "")
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
@@ -893,831 +951,656 @@
       const trimmed = String(url || "").trim();
       if (!trimmed) return "";
       if (/^https?:\/\//i.test(trimmed)) return trimmed;
-      return "https://" + trimmed;
+      return `https://${trimmed}`;
     }
 
-    function createId(prefix) {
-      return prefix + "_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 8);
+    function ownerLabel(value) {
+      if (value === "shared") return "共通";
+      if (value === "male") return "彼氏";
+      if (value === "female") return "彼女";
+      return value || "不明";
     }
 
-    function closeAccountMenu() {
-      accountMenuEl.classList.add("hidden");
+    function statusLabel(value) {
+      if (value === "idea") return "いつか";
+      if (value === "planning") return "検討中";
+      if (value === "active") return "進行中";
+      if (value === "done") return "達成";
+      return value || "不明";
     }
 
-    function showScreen(screenName) {
-      currentScreen = screenName;
-      document.querySelectorAll(".screen").forEach((el) => {
-        el.classList.toggle("active", el.id === `screen-${screenName}`);
+    function priorityLabel(value) {
+      if (Number(value) === 3) return "高";
+      if (Number(value) === 2) return "中";
+      if (Number(value) === 1) return "低";
+      return String(value ?? "");
+    }
+
+    function showLoggedOut() {
+      state.user = null;
+      state.places = [];
+      state.plans = [];
+      state.editingPlaceId = null;
+      state.editingPlanId = null;
+      els.authPanel.classList.remove("hidden");
+      els.appPanel.classList.add("hidden");
+      els.bottomNav.classList.add("hidden");
+      els.fab.classList.add("hidden");
+      els.accountBtn.classList.add("hidden");
+      els.accountMenu.classList.add("hidden");
+      renderAll();
+    }
+
+    function showLoggedIn(user) {
+      state.user = user;
+      els.authPanel.classList.add("hidden");
+      els.appPanel.classList.remove("hidden");
+      els.bottomNav.classList.remove("hidden");
+      els.fab.classList.remove("hidden");
+      els.accountBtn.classList.remove("hidden");
+      els.accountDot.classList.add("logged-in");
+      els.accountLabel.textContent = user.email || "ログイン中";
+      els.accountEmail.textContent = `${user.email || ""}\nユーザーID: ${user.id || ""}`;
+      els.settingsEmail.value = user.email || "";
+      els.settingsListId.value = SHARED_LIST_ID;
+      els.settingsStorage.value = "Supabase: items / life_plans";
+      renderAll();
+    }
+
+    function switchScreen(screen) {
+      state.currentScreen = screen;
+      Object.entries(screenEls).forEach(([key, el]) => {
+        el.classList.toggle("active", key === screen);
       });
       document.querySelectorAll(".nav-btn").forEach((btn) => {
-        btn.classList.toggle("active", btn.dataset.screen === screenName);
+        btn.classList.toggle("active", btn.dataset.screen === screen);
       });
     }
 
-    function updateAccountUi() {
-      if (currentUser) {
-        accountBtnEl.classList.remove("hidden");
-        accountDotEl.classList.add("logged-in");
-        accountLabelEl.textContent = currentUser.email || "ログイン中";
-        accountEmailEl.textContent = (currentUser.email || "") + "\nユーザーID: " + (currentUser.id || "");
-      } else {
-        accountBtnEl.classList.add("hidden");
-        accountDotEl.classList.remove("logged-in");
-        accountLabelEl.textContent = "未ログイン";
-        accountEmailEl.textContent = "ログインしていません";
-        closeAccountMenu();
-      }
+    function updatePlaceFilterTabs() {
+      els.placeVisitWantBtn.classList.toggle("active", state.placeVisitFilter === "want");
+      els.placeVisitDoneBtn.classList.toggle("active", state.placeVisitFilter === "done");
+      els.placeCategoryAllBtn.classList.toggle("active", state.placeCategoryFilter === "all");
+      els.placeCategoryFoodBtn.classList.toggle("active", state.placeCategoryFilter === "食");
+      els.placeCategoryTravelBtn.classList.toggle("active", state.placeCategoryFilter === "旅行");
     }
 
-    function updateTabs() {
-      tabWantEl.classList.toggle("active", currentTab === "want");
-      tabDoneEl.classList.toggle("active", currentTab === "done");
-      tabAllCategoryEl.classList.toggle("active", currentCategory === "all");
-      tabFoodEl.classList.toggle("active", currentCategory === "食");
-      tabTravelEl.classList.toggle("active", currentCategory === "旅行");
+    function updatePlanFilterTabs() {
+      document.querySelectorAll("[data-age-filter]").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.ageFilter === state.planAgeFilter);
+      });
+      document.querySelectorAll("[data-owner-filter]").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.ownerFilter === state.planOwnerFilter);
+      });
     }
 
-    function updateLifeTabs() {
-      lifeAgeAllEl.classList.toggle("active", lifeAgeFilter === "all");
-      lifeAge20El.classList.toggle("active", lifeAgeFilter === "20代");
-      lifeAge30El.classList.toggle("active", lifeAgeFilter === "30代");
-      lifeAge40El.classList.toggle("active", lifeAgeFilter === "40代");
-      lifeAge50El.classList.toggle("active", lifeAgeFilter === "50代+");
+    function updateFormTitles() {
+      const placeEditing = !!state.editingPlaceId;
+      const planEditing = !!state.editingPlanId;
+      els.placeFormTitle.textContent = placeEditing ? "行きたい場所を編集" : "行きたい場所を追加";
+      els.savePlaceBtn.textContent = placeEditing ? "更新する" : "追加する";
+      els.cancelPlaceEditBtn.classList.toggle("hidden", !placeEditing);
 
-      lifeOwnerAllEl.classList.toggle("active", lifeOwnerFilter === "all");
-      lifeOwnerSelfEl.classList.toggle("active", lifeOwnerFilter === "自分");
-      lifeOwnerPartnerEl.classList.toggle("active", lifeOwnerFilter === "彼女");
-      lifeOwnerSharedEl.classList.toggle("active", lifeOwnerFilter === "共通");
-    }
-
-    function updatePlaceFormUi() {
-      const isEditing = !!editingItemId;
-      placeFormTitleEl.textContent = isEditing ? "行きたい場所を編集" : "行きたい場所を追加";
-      saveBtnEl.textContent = isEditing ? "更新する" : "追加する";
-      cancelEditBtnEl.classList.toggle("hidden", !isEditing);
-    }
-
-    function updateLifeFormUi() {
-      const isEditing = !!editingLifePlanId;
-      lifeFormTitleEl.textContent = isEditing ? "ライフプランを編集" : "ライフプランを追加";
-      saveLifeBtnEl.textContent = isEditing ? "更新する" : "追加する";
-      cancelLifeEditBtnEl.classList.toggle("hidden", !isEditing);
+      els.planFormTitle.textContent = planEditing ? "ライフプランを編集" : "ライフプランを追加";
+      els.savePlanBtn.textContent = planEditing ? "更新する" : "追加する";
+      els.cancelPlanEditBtn.classList.toggle("hidden", !planEditing);
     }
 
     function resetPlaceForm() {
-      editingItemId = null;
-      shopNameEl.value = "";
-      shopUrlEl.value = "";
-      shopCategoryEl.value = "食";
-      updatePlaceFormUi();
+      state.editingPlaceId = null;
+      els.placeNameInput.value = "";
+      els.placeUrlInput.value = "";
+      els.placeCategoryInput.value = "食";
+      updateFormTitles();
     }
 
-    function resetLifeForm() {
-      editingLifePlanId = null;
-      lifeTitleEl.value = "";
-      lifeAgeGroupEl.value = "20代";
-      lifeCategoryEl.value = "旅行";
-      lifeOwnerTypeEl.value = "共通";
-      lifeStatusEl.value = "いつか";
-      lifeMemoEl.value = "";
-      updateLifeFormUi();
+    function resetPlanForm() {
+      state.editingPlanId = null;
+      els.planTitleInput.value = "";
+      els.planAgeInput.value = "20代";
+      els.planCategoryInput.value = "旅行";
+      els.planOwnerInput.value = "shared";
+      els.planStatusInput.value = "idea";
+      els.planPriorityInput.value = "2";
+      els.planNoteInput.value = "";
+      updateFormTitles();
     }
 
-    function setLifePlanMode(mode) {
-      lifePlanMode = mode;
-      const map = {
-        checking: "ライフプラン保存方式を確認中...",
-        supabase: "ライフプランは Supabase 共有保存です。",
-        local: "ライフプランは現在この端末のローカル保存です。life_plans テーブル作成後に共有保存へ切替できます。"
-      };
-      const text = map[mode] || "保存方式不明";
-      lifePlanStorageNoteEl.textContent = text;
-      lifePlanModeNoteEl.textContent = text;
-    }
-
-    function getCategoryLabel(category) {
-      if (category === "食") return "食";
-      if (category === "旅行") return "旅行";
-      return "未設定";
-    }
-
-    function renderItems() {
-      const filteredItems = items.filter((item) => {
-        const visitedMatch = currentTab === "want" ? !item.visited : item.visited;
-        const categoryMatch = currentCategory === "all" ? true : item.category === currentCategory;
-        return visitedMatch && categoryMatch;
+    function getFilteredPlaces() {
+      return state.places.filter((item) => {
+        const visitMatch = state.placeVisitFilter === "want" ? !item.visited : !!item.visited;
+        const categoryMatch = state.placeCategoryFilter === "all" ? true : item.category === state.placeCategoryFilter;
+        return visitMatch && categoryMatch;
       });
-
-      if (filteredItems.length === 0) {
-        listEl.innerHTML = `<div class="empty">該当する項目がありません。</div>`;
-        return;
-      }
-
-      listEl.innerHTML = filteredItems.map((item) => {
-        const safeId = escapeHtml(item.id);
-        const safeName = escapeHtml(item.name);
-        const safeUrl = escapeHtml(item.url || "");
-        const safeCategory = escapeHtml(getCategoryLabel(item.category));
-
-        return `
-          <article class="card">
-            <div class="category-badge">${safeCategory}</div>
-            <h2 class="card-title">${safeName}</h2>
-            ${item.url ? `<a class="url" href="${safeUrl}" target="_blank" rel="noopener noreferrer">${safeUrl}</a>` : `<p class="muted">URL未登録</p>`}
-            <div class="actions">
-              <button class="edit-btn" type="button" data-edit-id="${safeId}">編集</button>
-              <button class="toggle-btn" type="button" data-toggle-id="${safeId}" data-next-visited="${item.visited ? "false" : "true"}">${item.visited ? "行きたいに戻す" : "行った"}</button>
-              <button class="delete-btn" type="button" data-delete-id="${safeId}">削除</button>
-            </div>
-          </article>
-        `;
-      }).join("");
     }
 
-    function renderLifePlans() {
-      const filtered = lifePlans.filter((item) => {
-        const ageMatch = lifeAgeFilter === "all" ? true : item.age_group === lifeAgeFilter;
-        const ownerMatch = lifeOwnerFilter === "all" ? true : item.owner_type === lifeOwnerFilter;
+    function getFilteredPlans() {
+      return state.plans.filter((item) => {
+        const ageMatch = state.planAgeFilter === "all" ? true : item.age_group === state.planAgeFilter;
+        const ownerMatch = state.planOwnerFilter === "all" ? true : item.owner_type === state.planOwnerFilter;
         return ageMatch && ownerMatch;
       });
-
-      if (filtered.length === 0) {
-        lifeListEl.innerHTML = `<div class="empty">該当するライフプランがありません。</div>`;
-        return;
-      }
-
-      lifeListEl.innerHTML = filtered.map((item) => {
-        const id = escapeHtml(item.id);
-        const title = escapeHtml(item.title);
-        const memo = escapeHtml(item.memo || "");
-        const age = escapeHtml(item.age_group || "未設定");
-        const category = escapeHtml(item.category || "未設定");
-        const owner = escapeHtml(item.owner_type || "未設定");
-        const status = escapeHtml(item.status || "未設定");
-        return `
-          <article class="card">
-            <div class="pill">${age}</div>
-            <div class="pill">${category}</div>
-            <div class="pill">${owner}</div>
-            <div class="pill primary">${status}</div>
-            <h2 class="card-title">${title}</h2>
-            ${memo ? `<p class="muted">${memo}</p>` : `<p class="muted">メモなし</p>`}
-            <div class="actions">
-              <button class="edit-btn" type="button" data-life-edit-id="${id}">編集</button>
-              <button class="delete-btn" type="button" data-life-delete-id="${id}">削除</button>
-            </div>
-          </article>
-        `;
-      }).join("");
     }
 
-    function renderHome() {
-      const wantCount = items.filter((item) => !item.visited).length;
-      const doneCount = items.filter((item) => item.visited).length;
-      const sharedPlans = lifePlans.filter((item) => item.owner_type === "共通").length;
-      const inProgressPlans = lifePlans.filter((item) => item.status === "進行中").length;
-
-      summaryPlacesWantEl.textContent = String(wantCount);
-      summaryPlacesDoneEl.textContent = String(doneCount);
-      summarySharedPlansEl.textContent = String(sharedPlans);
-      summaryInProgressPlansEl.textContent = String(inProgressPlans);
-
-      const recentPlaces = items.slice(0, 2).map((item) => ({
-        type: "place",
-        title: item.name,
-        meta: `${item.category || "未設定"} / ${item.visited ? "行った" : "行きたい"}`,
-        note: item.url || "URL未登録"
-      }));
-
-      const recentPlans = lifePlans.slice(0, 2).map((item) => ({
-        type: "plan",
-        title: item.title,
-        meta: `${item.age_group} / ${item.owner_type} / ${item.status}`,
-        note: item.memo || item.category || ""
-      }));
-
-      const merged = [...recentPlaces, ...recentPlans].slice(0, 4);
-      if (merged.length === 0) {
-        homeHighlightsEl.innerHTML = `<div class="empty">まだ項目がありません。右下の＋から追加できます。</div>`;
+    function renderPlaces() {
+      updatePlaceFilterTabs();
+      const rows = getFilteredPlaces();
+      if (rows.length === 0) {
+        els.placesList.innerHTML = `<div class="empty-state">該当する行きたい場所がありません。</div>`;
         return;
       }
-
-      homeHighlightsEl.innerHTML = merged.map((item) => `
+      els.placesList.innerHTML = rows.map((item) => `
         <article class="card">
-          <div class="pill">${item.type === "place" ? "行きたいリスト" : "ライフプラン"}</div>
-          <h3 class="card-title">${escapeHtml(item.title)}</h3>
-          <p class="muted">${escapeHtml(item.meta)}\n${escapeHtml(item.note || "")}</p>
+          <div class="pill-row">
+            <span class="pill">${escapeHtml(item.category || "未設定")}</span>
+            <span class="pill primary">${item.visited ? "行った" : "行きたい"}</span>
+          </div>
+          <h3 class="card-title">${escapeHtml(item.name)}</h3>
+          <a class="card-link" href="${escapeHtml(item.url || "#")}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.url || "URLなし")}</a>
+          <div class="card-actions">
+            <button class="secondary-btn" type="button" data-place-edit="${escapeHtml(item.id)}">編集</button>
+            <button class="secondary-btn" type="button" data-place-toggle="${escapeHtml(item.id)}" data-next-visited="${item.visited ? "false" : "true"}">${item.visited ? "行きたいに戻す" : "行った"}</button>
+            <button class="danger-btn" type="button" data-place-delete="${escapeHtml(item.id)}">削除</button>
+          </div>
         </article>
       `).join("");
     }
 
-    function showLoggedOut() {
-      currentUser = null;
-      items = [];
-      lifePlans = [];
-      authPanelEl.classList.remove("hidden");
-      appPanelEl.classList.add("hidden");
-      navBarEl.classList.add("hidden");
-      fabEl.classList.add("hidden");
-      updateAccountUi();
-      resetPlaceForm();
-      resetLifeForm();
-      renderItems();
-      renderLifePlans();
+    function renderPlans() {
+      updatePlanFilterTabs();
+      const rows = getFilteredPlans();
+      if (rows.length === 0) {
+        els.plansList.innerHTML = `<div class="empty-state">該当するライフプランがありません。</div>`;
+        return;
+      }
+      els.plansList.innerHTML = rows.map((item) => `
+        <article class="card">
+          <div class="pill-row">
+            <span class="pill">${escapeHtml(item.age_group || "")}</span>
+            <span class="pill">${escapeHtml(item.category || "")}</span>
+            <span class="pill">${escapeHtml(ownerLabel(item.owner_type))}</span>
+            <span class="pill primary">${escapeHtml(statusLabel(item.status))}</span>
+            <span class="pill">優先度 ${escapeHtml(priorityLabel(item.priority))}</span>
+          </div>
+          <h3 class="card-title">${escapeHtml(item.title)}</h3>
+          <p class="card-text">${escapeHtml(item.note || "メモなし")}</p>
+          <div class="card-actions">
+            <button class="secondary-btn" type="button" data-plan-edit="${escapeHtml(item.id)}">編集</button>
+            <button class="danger-btn" type="button" data-plan-delete="${escapeHtml(item.id)}">削除</button>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function renderHome() {
+      const wantCount = state.places.filter((item) => !item.visited).length;
+      const doneCount = state.places.filter((item) => !!item.visited).length;
+      const sharedCount = state.plans.filter((item) => item.owner_type === "shared").length;
+      const activeCount = state.plans.filter((item) => item.status === "active").length;
+      els.summaryWant.textContent = String(wantCount);
+      els.summaryDone.textContent = String(doneCount);
+      els.summaryShared.textContent = String(sharedCount);
+      els.summaryActive.textContent = String(activeCount);
+
+      const latestPlaces = [...state.places].slice(0, 3);
+      const topPlans = [...state.plans]
+        .sort((a, b) => (Number(b.priority) - Number(a.priority)) || String(b.created_at || "").localeCompare(String(a.created_at || "")))
+        .slice(0, 3);
+
+      els.homePlaces.innerHTML = latestPlaces.length ? latestPlaces.map((item) => `
+        <article class="card">
+          <div class="pill-row">
+            <span class="pill">${escapeHtml(item.category || "")}</span>
+            <span class="pill primary">${item.visited ? "行った" : "行きたい"}</span>
+          </div>
+          <h3 class="card-title">${escapeHtml(item.name)}</h3>
+        </article>
+      `).join("") : `<div class="empty-state">まだ行きたい場所がありません。</div>`;
+
+      els.homePlans.innerHTML = topPlans.length ? topPlans.map((item) => `
+        <article class="card">
+          <div class="pill-row">
+            <span class="pill">${escapeHtml(item.age_group || "")}</span>
+            <span class="pill">${escapeHtml(ownerLabel(item.owner_type))}</span>
+            <span class="pill primary">${escapeHtml(statusLabel(item.status))}</span>
+          </div>
+          <h3 class="card-title">${escapeHtml(item.title)}</h3>
+          <p class="card-text">${escapeHtml(item.note || "")}</p>
+        </article>
+      `).join("") : `<div class="empty-state">まだライフプランがありません。</div>`;
+    }
+
+    function renderSettings() {
+      els.settingsItemsCount.textContent = String(state.places.length);
+      els.settingsPlansCount.textContent = String(state.plans.length);
+    }
+
+    function renderAll() {
+      updateFormTitles();
       renderHome();
-      showScreen("home");
+      renderPlaces();
+      renderPlans();
+      renderSettings();
     }
 
-    function showLoggedIn(user) {
-      currentUser = user;
-      authPanelEl.classList.add("hidden");
-      appPanelEl.classList.remove("hidden");
-      navBarEl.classList.remove("hidden");
-      fabEl.classList.remove("hidden");
-      updateAccountUi();
-    }
-
-    async function sendOtpCode() {
-      const email = emailInputEl.value.trim();
-      if (!email) {
-        setStatus(authStatusEl, "メールアドレスを入力してください。", "error");
-        return;
-      }
-
-      loginBtnEl.disabled = true;
-      setStatus(authStatusEl, "認証コードを送信中...", "");
-
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: { shouldCreateUser: true }
-      });
-
-      loginBtnEl.disabled = false;
-
-      if (error) {
-        setStatus(authStatusEl, "送信に失敗しました: " + error.message, "error");
-        return;
-      }
-
-      pendingEmail = email;
-      otpPanelEl.classList.remove("hidden");
-      otpInputEl.focus();
-      setStatus(authStatusEl, "認証コードを送信しました。メール内の8桁コードを入力してください。", "success");
-    }
-
-    async function verifyOtpCode() {
-      const email = emailInputEl.value.trim() || pendingEmail;
-      const token = otpInputEl.value.trim();
-
-      if (!email) {
-        setStatus(authStatusEl, "先にメールアドレスを入力してください。", "error");
-        return;
-      }
-      if (!token || token.length < 8) {
-        setStatus(authStatusEl, "8桁の認証コードを入力してください。", "error");
-        return;
-      }
-
-      verifyBtnEl.disabled = true;
-      setStatus(authStatusEl, "認証中...", "");
-
-      const { error } = await supabase.auth.verifyOtp({ email, token, type: "email" });
-
-      verifyBtnEl.disabled = false;
-
-      if (error) {
-        setStatus(authStatusEl, "認証に失敗しました: " + error.message, "error");
-        return;
-      }
-
-      setStatus(authStatusEl, "ログインしました。", "success");
-      await handleSession();
-    }
-
-    async function verifyMembershipAndLoadItems(user) {
-      const { data: membership, error: membershipError } = await supabase
-        .from("list_members")
-        .select("id, user_id, list_id, role")
-        .eq("list_id", SHARED_LIST_ID)
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      if (membershipError) {
-        items = [];
-        renderItems();
-        renderHome();
-        setStatus(itemStatusEl, "list_members の確認に失敗しました: " + membershipError.message, "error");
-        return false;
-      }
-
-      if (!membership) {
-        items = [];
-        renderItems();
-        renderHome();
-        setStatus(itemStatusEl, "このユーザーは共有リストのメンバーではありません。", "error");
-        return false;
-      }
-
-      await loadItems();
-      return true;
-    }
-
-    async function loadItems() {
-      setStatus(itemStatusEl, "読み込み中...", "");
-
+    async function loadPlaces() {
       const { data, error } = await supabase
         .from("items")
         .select("id, name, url, visited, category, created_at")
         .eq("list_id", SHARED_LIST_ID)
         .order("created_at", { ascending: false });
 
-      if (error) {
-        items = [];
-        renderItems();
-        renderHome();
-        setStatus(itemStatusEl, "読み込みに失敗しました: " + error.message, "error");
-        return;
-      }
-
-      items = Array.isArray(data) ? data : [];
-      setStatus(itemStatusEl, "", "");
-      renderItems();
-      renderHome();
+      if (error) throw error;
+      state.places = Array.isArray(data) ? data : [];
     }
 
-    function readLocalLifePlans() {
+    async function loadPlans() {
+      const { data, error } = await supabase
+        .from("life_plans")
+        .select("id, title, age_group, category, owner_type, status, priority, note, created_at, updated_at")
+        .eq("list_id", SHARED_LIST_ID)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      state.plans = Array.isArray(data) ? data : [];
+    }
+
+    async function verifyMembership(user) {
+      const { data, error } = await supabase
+        .from("list_members")
+        .select("id")
+        .eq("list_id", SHARED_LIST_ID)
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (error) throw error;
+      if (!data) throw new Error("このユーザーは共有リストのメンバーではありません。list_members を確認してください。");
+    }
+
+    async function reloadAllData(statusEl = null) {
       try {
-        const raw = localStorage.getItem(LIFE_PLAN_FALLBACK_KEY);
-        const parsed = raw ? JSON.parse(raw) : [];
-        return Array.isArray(parsed) ? parsed : [];
-      } catch {
-        return [];
+        if (statusEl) setStatus(statusEl, "再読み込み中...");
+        await Promise.all([loadPlaces(), loadPlans()]);
+        renderAll();
+        if (statusEl) setStatus(statusEl, "再読み込みしました。", "success");
+      } catch (error) {
+        if (statusEl) setStatus(statusEl, `再読み込みに失敗しました: ${error.message}`, "error");
+        else console.error(error);
       }
     }
 
-    function writeLocalLifePlans(data) {
-      localStorage.setItem(LIFE_PLAN_FALLBACK_KEY, JSON.stringify(data));
-    }
-
-    async function detectLifePlanModeAndLoad() {
-      setLifePlanMode("checking");
+    async function handleSession() {
       try {
-        const { data, error } = await supabase
-          .from("life_plans")
-          .select("id, list_id, title, age_group, category, owner_type, status, memo, created_at")
-          .eq("list_id", SHARED_LIST_ID)
-          .order("created_at", { ascending: false });
-
+        setStatus(els.authStatus, "");
+        const { data, error } = await supabase.auth.getSession();
         if (error) throw error;
-        lifePlans = Array.isArray(data) ? data : [];
-        setLifePlanMode("supabase");
-      } catch (_error) {
-        lifePlans = readLocalLifePlans();
-        lifePlans.sort((a, b) => String(b.created_at || "").localeCompare(String(a.created_at || "")));
-        setLifePlanMode("local");
+        const session = data.session;
+        if (!session?.user) {
+          showLoggedOut();
+          return;
+        }
+        await verifyMembership(session.user);
+        showLoggedIn(session.user);
+        els.otpPanel.classList.add("hidden");
+        els.otpInput.value = "";
+        state.pendingEmail = "";
+        await reloadAllData();
+      } catch (error) {
+        showLoggedOut();
+        setStatus(els.authStatus, `ログイン状態の確認に失敗しました: ${error.message}`, "error");
       }
-
-      renderLifePlans();
-      renderHome();
     }
 
-    function startEditItem(id) {
-      const item = items.find((row) => row.id === id);
-      if (!item) {
-        setStatus(itemStatusEl, "編集対象が見つかりません。", "error");
+    async function sendOtpCode() {
+      const email = els.emailInput.value.trim();
+      if (!email) {
+        setStatus(els.authStatus, "メールアドレスを入力してください。", "error");
         return;
       }
-
-      editingItemId = id;
-      shopNameEl.value = item.name || "";
-      shopUrlEl.value = item.url || "";
-      shopCategoryEl.value = item.category || "食";
-      updatePlaceFormUi();
-      setStatus(itemStatusEl, "編集モードです。内容を修正して更新してください。", "");
-      showScreen("places");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      shopNameEl.focus();
-    }
-
-    function startEditLifePlan(id) {
-      const item = lifePlans.find((row) => row.id === id);
-      if (!item) {
-        setStatus(lifeStatusMsgEl, "編集対象が見つかりません。", "error");
+      els.loginBtn.disabled = true;
+      setStatus(els.authStatus, "認証コードを送信中...");
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { shouldCreateUser: true }
+      });
+      els.loginBtn.disabled = false;
+      if (error) {
+        setStatus(els.authStatus, `送信に失敗しました: ${error.message}`, "error");
         return;
       }
-
-      editingLifePlanId = id;
-      lifeTitleEl.value = item.title || "";
-      lifeAgeGroupEl.value = item.age_group || "20代";
-      lifeCategoryEl.value = item.category || "旅行";
-      lifeOwnerTypeEl.value = item.owner_type || "共通";
-      lifeStatusEl.value = item.status || "いつか";
-      lifeMemoEl.value = item.memo || "";
-      updateLifeFormUi();
-      setStatus(lifeStatusMsgEl, "編集モードです。内容を修正して更新してください。", "");
-      showScreen("life");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      lifeTitleEl.focus();
+      state.pendingEmail = email;
+      els.otpPanel.classList.remove("hidden");
+      setStatus(els.authStatus, "認証コードを送信しました。", "success");
+      els.otpInput.focus();
     }
 
-    function cancelEdit() {
-      resetPlaceForm();
-      setStatus(itemStatusEl, "編集をキャンセルしました。", "");
+    async function verifyOtpCode() {
+      const email = els.emailInput.value.trim() || state.pendingEmail;
+      const token = els.otpInput.value.trim();
+      if (!email) {
+        setStatus(els.authStatus, "先にメールアドレスを入力してください。", "error");
+        return;
+      }
+      if (token.length < 8) {
+        setStatus(els.authStatus, "8桁の認証コードを入力してください。", "error");
+        return;
+      }
+      els.verifyBtn.disabled = true;
+      setStatus(els.authStatus, "認証中...");
+      const { error } = await supabase.auth.verifyOtp({ email, token, type: "email" });
+      els.verifyBtn.disabled = false;
+      if (error) {
+        setStatus(els.authStatus, `認証に失敗しました: ${error.message}`, "error");
+        return;
+      }
+      setStatus(els.authStatus, "ログインしました。", "success");
+      await handleSession();
     }
 
-    function cancelLifeEdit() {
-      resetLifeForm();
-      setStatus(lifeStatusMsgEl, "編集をキャンセルしました。", "");
-    }
+    async function savePlace() {
+      const name = els.placeNameInput.value.trim();
+      const url = normalizeUrl(els.placeUrlInput.value);
+      const category = els.placeCategoryInput.value;
 
-    async function saveItem() {
-      const name = shopNameEl.value.trim();
-      const url = normalizeUrl(shopUrlEl.value);
-      const category = shopCategoryEl.value;
-
-      if (!currentUser) {
-        setStatus(itemStatusEl, "先にログインしてください。", "error");
+      if (!state.user) {
+        setStatus(els.placeStatus, "先にログインしてください。", "error");
         return;
       }
       if (!name) {
-        setStatus(itemStatusEl, "名前を入力してください。", "error");
+        setStatus(els.placeStatus, "店名・場所名を入力してください。", "error");
         return;
       }
       if (!url) {
-        setStatus(itemStatusEl, "URLを入力してください。", "error");
+        setStatus(els.placeStatus, "URLを入力してください。", "error");
+        return;
+      }
+      try { new URL(url); } catch {
+        setStatus(els.placeStatus, "URLの形式が正しくありません。", "error");
         return;
       }
 
-      try {
-        new URL(url);
-      } catch {
-        setStatus(itemStatusEl, "URLの形式が正しくありません。", "error");
-        return;
-      }
-
-      saveBtnEl.disabled = true;
-      cancelEditBtnEl.disabled = true;
-      setStatus(itemStatusEl, editingItemId ? "更新中..." : "保存中...", "");
+      els.savePlaceBtn.disabled = true;
+      setStatus(els.placeStatus, state.editingPlaceId ? "更新中..." : "保存中...");
 
       let error = null;
-      if (editingItemId) {
-        const result = await supabase
+      if (state.editingPlaceId) {
+        ({ error } = await supabase
           .from("items")
           .update({ name, url, category })
-          .eq("id", editingItemId)
-          .eq("list_id", SHARED_LIST_ID);
-        error = result.error;
+          .eq("id", state.editingPlaceId)
+          .eq("list_id", SHARED_LIST_ID));
       } else {
-        const result = await supabase
+        ({ error } = await supabase
           .from("items")
-          .insert({
-            list_id: SHARED_LIST_ID,
-            name,
-            url,
-            category,
-            visited: false,
-            created_by: currentUser.id
-          });
-        error = result.error;
+          .insert({ list_id: SHARED_LIST_ID, name, url, category, visited: false, created_by: state.user.id }));
       }
 
-      saveBtnEl.disabled = false;
-      cancelEditBtnEl.disabled = false;
-
+      els.savePlaceBtn.disabled = false;
       if (error) {
-        setStatus(itemStatusEl, (editingItemId ? "更新" : "保存") + "に失敗しました: " + error.message, "error");
+        setStatus(els.placeStatus, `保存に失敗しました: ${error.message}`, "error");
         return;
       }
 
-      const wasEditing = !!editingItemId;
+      const wasEditing = !!state.editingPlaceId;
       resetPlaceForm();
-      setStatus(itemStatusEl, wasEditing ? "更新しました。" : "保存しました。", "success");
-      await loadItems();
+      await reloadAllData();
+      setStatus(els.placeStatus, wasEditing ? "更新しました。" : "保存しました。", "success");
     }
 
-    async function saveLifePlan() {
-      const payload = {
-        title: lifeTitleEl.value.trim(),
-        age_group: lifeAgeGroupEl.value,
-        category: lifeCategoryEl.value,
-        owner_type: lifeOwnerTypeEl.value,
-        status: lifeStatusEl.value,
-        memo: lifeMemoEl.value.trim()
-      };
+    async function savePlan() {
+      const title = els.planTitleInput.value.trim();
+      const age_group = els.planAgeInput.value;
+      const category = els.planCategoryInput.value;
+      const owner_type = els.planOwnerInput.value;
+      const status = els.planStatusInput.value;
+      const priority = Number(els.planPriorityInput.value);
+      const note = els.planNoteInput.value.trim();
 
-      if (!payload.title) {
-        setStatus(lifeStatusMsgEl, "やりたいことを入力してください。", "error");
+      if (!state.user) {
+        setStatus(els.planStatus, "先にログインしてください。", "error");
+        return;
+      }
+      if (!title) {
+        setStatus(els.planStatus, "やりたいことを入力してください。", "error");
         return;
       }
 
-      saveLifeBtnEl.disabled = true;
-      cancelLifeEditBtnEl.disabled = true;
-      setStatus(lifeStatusMsgEl, editingLifePlanId ? "更新中..." : "保存中...", "");
+      const payload = {
+        list_id: SHARED_LIST_ID,
+        title,
+        age_group,
+        category,
+        owner_type,
+        status,
+        priority,
+        note,
+        created_by: state.user.id
+      };
 
-      try {
-        if (lifePlanMode === "supabase") {
-          if (editingLifePlanId) {
-            const { error } = await supabase
-              .from("life_plans")
-              .update(payload)
-              .eq("id", editingLifePlanId)
-              .eq("list_id", SHARED_LIST_ID);
-            if (error) throw error;
-          } else {
-            const { error } = await supabase
-              .from("life_plans")
-              .insert({
-                list_id: SHARED_LIST_ID,
-                ...payload,
-                created_by: currentUser?.id || null
-              });
-            if (error) throw error;
-          }
-          await detectLifePlanModeAndLoad();
-        } else {
-          const data = readLocalLifePlans();
-          if (editingLifePlanId) {
-            const index = data.findIndex((row) => row.id === editingLifePlanId);
-            if (index === -1) throw new Error("編集対象が見つかりません。");
-            data[index] = { ...data[index], ...payload };
-          } else {
-            data.unshift({
-              id: createId("life"),
-              list_id: SHARED_LIST_ID,
-              ...payload,
-              created_at: new Date().toISOString(),
-              created_by: currentUser?.id || null
-            });
-          }
-          writeLocalLifePlans(data);
-          lifePlans = data;
-          lifePlans.sort((a, b) => String(b.created_at || "").localeCompare(String(a.created_at || "")));
-          renderLifePlans();
-          renderHome();
-        }
+      els.savePlanBtn.disabled = true;
+      setStatus(els.planStatus, state.editingPlanId ? "更新中..." : "保存中...");
 
-        const wasEditing = !!editingLifePlanId;
-        resetLifeForm();
-        setStatus(lifeStatusMsgEl, wasEditing ? "更新しました。" : "保存しました。", "success");
-      } catch (error) {
-        setStatus(lifeStatusMsgEl, (editingLifePlanId ? "更新" : "保存") + "に失敗しました: " + error.message, "error");
-      } finally {
-        saveLifeBtnEl.disabled = false;
-        cancelLifeEditBtnEl.disabled = false;
+      let error = null;
+      if (state.editingPlanId) {
+        const updatePayload = { ...payload };
+        delete updatePayload.created_by;
+        ({ error } = await supabase
+          .from("life_plans")
+          .update(updatePayload)
+          .eq("id", state.editingPlanId)
+          .eq("list_id", SHARED_LIST_ID));
+      } else {
+        ({ error } = await supabase.from("life_plans").insert(payload));
       }
+
+      els.savePlanBtn.disabled = false;
+      if (error) {
+        setStatus(els.planStatus, `保存に失敗しました: ${error.message}`, "error");
+        return;
+      }
+
+      const wasEditing = !!state.editingPlanId;
+      resetPlanForm();
+      await reloadAllData();
+      setStatus(els.planStatus, wasEditing ? "更新しました。" : "保存しました。", "success");
+    }
+
+    function startPlaceEdit(id) {
+      const item = state.places.find((row) => row.id === id);
+      if (!item) return;
+      state.editingPlaceId = id;
+      els.placeNameInput.value = item.name || "";
+      els.placeUrlInput.value = item.url || "";
+      els.placeCategoryInput.value = item.category || "食";
+      updateFormTitles();
+      switchScreen("places");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setStatus(els.placeStatus, "編集モードです。", "warning");
+    }
+
+    function startPlanEdit(id) {
+      const item = state.plans.find((row) => row.id === id);
+      if (!item) return;
+      state.editingPlanId = id;
+      els.planTitleInput.value = item.title || "";
+      els.planAgeInput.value = item.age_group || "20代";
+      els.planCategoryInput.value = item.category || "旅行";
+      els.planOwnerInput.value = item.owner_type || "shared";
+      els.planStatusInput.value = item.status || "idea";
+      els.planPriorityInput.value = String(item.priority ?? 2);
+      els.planNoteInput.value = item.note || "";
+      updateFormTitles();
+      switchScreen("plans");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setStatus(els.planStatus, "編集モードです。", "warning");
     }
 
     async function toggleVisited(id, nextVisited) {
-      setStatus(itemStatusEl, "更新中...", "");
-
+      setStatus(els.placeStatus, "更新中...");
       const { error } = await supabase
         .from("items")
         .update({ visited: nextVisited })
         .eq("id", id)
         .eq("list_id", SHARED_LIST_ID);
-
       if (error) {
-        setStatus(itemStatusEl, "更新に失敗しました: " + error.message, "error");
+        setStatus(els.placeStatus, `更新に失敗しました: ${error.message}`, "error");
         return;
       }
-
-      if (editingItemId === id) resetPlaceForm();
-      setStatus(itemStatusEl, "更新しました。", "success");
-      await loadItems();
+      await reloadAllData();
+      setStatus(els.placeStatus, "更新しました。", "success");
     }
 
-    function openDeleteConfirm(type, id) {
-      pendingDelete = { type, id };
-      confirmDeleteTextEl.textContent = type === "life" ? "このライフプランを削除していいですか？" : "この項目を削除していいですか？";
-      deleteConfirmModalEl.classList.remove("hidden");
+    function openDeleteModal(target) {
+      state.deleteTarget = target;
+      els.deleteModalText.textContent = `${target.kind === "place" ? "この行きたい場所" : "このライフプラン"}を削除しますか？`;
+      els.deleteModal.classList.remove("hidden");
     }
 
-    function closeDeleteConfirm() {
-      pendingDelete = { type: null, id: null };
-      deleteConfirmModalEl.classList.add("hidden");
+    function closeDeleteModal() {
+      state.deleteTarget = null;
+      els.deleteModal.classList.add("hidden");
     }
 
-    async function deleteItem(id) {
-      setStatus(itemStatusEl, "削除中...", "");
-      const { error } = await supabase
-        .from("items")
-        .delete()
-        .eq("id", id)
-        .eq("list_id", SHARED_LIST_ID);
-
+    async function confirmDelete() {
+      if (!state.deleteTarget) return;
+      const { kind, id } = state.deleteTarget;
+      const table = kind === "place" ? "items" : "life_plans";
+      const statusEl = kind === "place" ? els.placeStatus : els.planStatus;
+      setStatus(statusEl, "削除中...");
+      const { error } = await supabase.from(table).delete().eq("id", id).eq("list_id", SHARED_LIST_ID);
       if (error) {
-        setStatus(itemStatusEl, "削除に失敗しました: " + error.message, "error");
+        setStatus(statusEl, `削除に失敗しました: ${error.message}`, "error");
+        closeDeleteModal();
         return;
       }
-
-      if (editingItemId === id) resetPlaceForm();
-      setStatus(itemStatusEl, "削除しました。", "success");
-      await loadItems();
+      if (kind === "place" && state.editingPlaceId === id) resetPlaceForm();
+      if (kind === "plan" && state.editingPlanId === id) resetPlanForm();
+      await reloadAllData();
+      setStatus(statusEl, "削除しました。", "success");
+      closeDeleteModal();
     }
 
-    async function deleteLifePlan(id) {
-      setStatus(lifeStatusMsgEl, "削除中...", "");
-      try {
-        if (lifePlanMode === "supabase") {
-          const { error } = await supabase
-            .from("life_plans")
-            .delete()
-            .eq("id", id)
-            .eq("list_id", SHARED_LIST_ID);
-          if (error) throw error;
-          await detectLifePlanModeAndLoad();
-        } else {
-          const data = readLocalLifePlans().filter((row) => row.id !== id);
-          writeLocalLifePlans(data);
-          lifePlans = data;
-          lifePlans.sort((a, b) => String(b.created_at || "").localeCompare(String(a.created_at || "")));
-          renderLifePlans();
-          renderHome();
-        }
-        if (editingLifePlanId === id) resetLifeForm();
-        setStatus(lifeStatusMsgEl, "削除しました。", "success");
-      } catch (error) {
-        setStatus(lifeStatusMsgEl, "削除に失敗しました: " + error.message, "error");
-      }
+    function openFabModal() {
+      els.fabModal.classList.remove("hidden");
     }
 
-    function openActionSheet() {
-      actionSheetBackdropEl.classList.remove("hidden");
-    }
-
-    function closeActionSheet() {
-      actionSheetBackdropEl.classList.add("hidden");
-    }
-
-    async function handleSession() {
-      setStatus(authStatusEl, "", "");
-      setStatus(itemStatusEl, "", "");
-      setStatus(lifeStatusMsgEl, "", "");
-
-      const { data, error } = await supabase.auth.getSession();
-      if (error) {
-        showLoggedOut();
-        setStatus(authStatusEl, "セッション確認に失敗しました: " + error.message, "error");
-        return;
-      }
-
-      const session = data.session;
-      if (!session || !session.user) {
-        showLoggedOut();
-        return;
-      }
-
-      otpPanelEl.classList.add("hidden");
-      otpInputEl.value = "";
-      pendingEmail = "";
-      showLoggedIn(session.user);
-      const memberOk = await verifyMembershipAndLoadItems(session.user);
-      if (memberOk) {
-        await detectLifePlanModeAndLoad();
-      } else {
-        setLifePlanMode("local");
-        lifePlans = readLocalLifePlans();
-        renderLifePlans();
-        renderHome();
-      }
+    function closeFabModal() {
+      els.fabModal.classList.add("hidden");
     }
 
     function bindEvents() {
-      accountBtnEl.addEventListener("click", (event) => {
-        event.stopPropagation();
-        accountMenuEl.classList.toggle("hidden");
-      });
+      els.loginBtn.addEventListener("click", sendOtpCode);
+      els.verifyBtn.addEventListener("click", verifyOtpCode);
+      els.emailInput.addEventListener("keydown", (e) => { if (e.key === "Enter") sendOtpCode(); });
+      els.otpInput.addEventListener("keydown", (e) => { if (e.key === "Enter") verifyOtpCode(); });
 
-      accountMenuEl.addEventListener("click", (event) => {
-        event.stopPropagation();
+      els.accountBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        els.accountMenu.classList.toggle("hidden");
       });
+      els.accountMenu.addEventListener("click", (e) => e.stopPropagation());
+      document.addEventListener("click", () => els.accountMenu.classList.add("hidden"));
 
-      document.addEventListener("click", () => closeAccountMenu());
-
-      document.querySelectorAll(".nav-btn").forEach((btn) => {
-        btn.addEventListener("click", () => showScreen(btn.dataset.screen));
+      els.reloadBtn.addEventListener("click", async () => {
+        els.accountMenu.classList.add("hidden");
+        await reloadAllData(els.settingsStatus);
       });
-
-      fabEl.addEventListener("click", openActionSheet);
-      closeActionSheetBtnEl.addEventListener("click", closeActionSheet);
-      actionSheetBackdropEl.addEventListener("click", (event) => {
-        if (event.target === actionSheetBackdropEl) closeActionSheet();
-      });
-
-      openPlaceFormBtnEl.addEventListener("click", () => {
-        closeActionSheet();
-        showScreen("places");
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        shopNameEl.focus();
-      });
-
-      openLifeFormBtnEl.addEventListener("click", () => {
-        closeActionSheet();
-        showScreen("life");
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        lifeTitleEl.focus();
-      });
-
-      loginBtnEl.addEventListener("click", sendOtpCode);
-      emailInputEl.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") sendOtpCode();
-      });
-
-      verifyBtnEl.addEventListener("click", verifyOtpCode);
-      otpInputEl.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") verifyOtpCode();
-      });
-
-      saveBtnEl.addEventListener("click", saveItem);
-      cancelEditBtnEl.addEventListener("click", cancelEdit);
-      saveLifeBtnEl.addEventListener("click", saveLifePlan);
-      cancelLifeEditBtnEl.addEventListener("click", cancelLifeEdit);
-
-      shopNameEl.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") saveItem();
-      });
-      shopUrlEl.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") saveItem();
-      });
-      lifeTitleEl.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") saveLifePlan();
-      });
-
-      reloadBtnEl.addEventListener("click", async () => {
-        closeAccountMenu();
-        await loadItems();
-        await detectLifePlanModeAndLoad();
-      });
-
-      logoutBtnEl.addEventListener("click", async () => {
-        closeAccountMenu();
+      els.logoutBtn.addEventListener("click", async () => {
+        els.accountMenu.classList.add("hidden");
         const { error } = await supabase.auth.signOut();
         if (error) {
-          setStatus(itemStatusEl, "ログアウトに失敗しました: " + error.message, "error");
+          setStatus(els.settingsStatus, `ログアウトに失敗しました: ${error.message}`, "error");
           return;
         }
-        otpInputEl.value = "";
-        pendingEmail = "";
         showLoggedOut();
-        setStatus(authStatusEl, "ログアウトしました。", "success");
+        setStatus(els.authStatus, "ログアウトしました。", "success");
       });
 
-      tabAllCategoryEl.addEventListener("click", () => { currentCategory = "all"; updateTabs(); renderItems(); });
-      tabFoodEl.addEventListener("click", () => { currentCategory = "食"; updateTabs(); renderItems(); });
-      tabTravelEl.addEventListener("click", () => { currentCategory = "旅行"; updateTabs(); renderItems(); });
-      tabWantEl.addEventListener("click", () => { currentTab = "want"; updateTabs(); renderItems(); });
-      tabDoneEl.addEventListener("click", () => { currentTab = "done"; updateTabs(); renderItems(); });
+      document.querySelectorAll(".nav-btn").forEach((btn) => {
+        btn.addEventListener("click", () => switchScreen(btn.dataset.screen));
+      });
 
-      lifeAgeAllEl.addEventListener("click", () => { lifeAgeFilter = "all"; updateLifeTabs(); renderLifePlans(); });
-      lifeAge20El.addEventListener("click", () => { lifeAgeFilter = "20代"; updateLifeTabs(); renderLifePlans(); });
-      lifeAge30El.addEventListener("click", () => { lifeAgeFilter = "30代"; updateLifeTabs(); renderLifePlans(); });
-      lifeAge40El.addEventListener("click", () => { lifeAgeFilter = "40代"; updateLifeTabs(); renderLifePlans(); });
-      lifeAge50El.addEventListener("click", () => { lifeAgeFilter = "50代+"; updateLifeTabs(); renderLifePlans(); });
+      els.fab.addEventListener("click", openFabModal);
+      els.closeFabModalBtn.addEventListener("click", closeFabModal);
+      els.fabModal.addEventListener("click", (e) => {
+        if (e.target === els.fabModal) closeFabModal();
+      });
+      els.openPlaceFormBtn.addEventListener("click", () => {
+        closeFabModal();
+        switchScreen("places");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        els.placeNameInput.focus();
+      });
+      els.openPlanFormBtn.addEventListener("click", () => {
+        closeFabModal();
+        switchScreen("plans");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        els.planTitleInput.focus();
+      });
 
-      lifeOwnerAllEl.addEventListener("click", () => { lifeOwnerFilter = "all"; updateLifeTabs(); renderLifePlans(); });
-      lifeOwnerSelfEl.addEventListener("click", () => { lifeOwnerFilter = "自分"; updateLifeTabs(); renderLifePlans(); });
-      lifeOwnerPartnerEl.addEventListener("click", () => { lifeOwnerFilter = "彼女"; updateLifeTabs(); renderLifePlans(); });
-      lifeOwnerSharedEl.addEventListener("click", () => { lifeOwnerFilter = "共通"; updateLifeTabs(); renderLifePlans(); });
+      els.savePlaceBtn.addEventListener("click", savePlace);
+      els.cancelPlaceEditBtn.addEventListener("click", () => {
+        resetPlaceForm();
+        setStatus(els.placeStatus, "編集をキャンセルしました。");
+      });
+      els.savePlanBtn.addEventListener("click", savePlan);
+      els.cancelPlanEditBtn.addEventListener("click", () => {
+        resetPlanForm();
+        setStatus(els.planStatus, "編集をキャンセルしました。");
+      });
 
-      listEl.addEventListener("click", async (event) => {
-        const target = event.target;
+      els.placeCategoryAllBtn.addEventListener("click", () => { state.placeCategoryFilter = "all"; renderPlaces(); });
+      els.placeCategoryFoodBtn.addEventListener("click", () => { state.placeCategoryFilter = "食"; renderPlaces(); });
+      els.placeCategoryTravelBtn.addEventListener("click", () => { state.placeCategoryFilter = "旅行"; renderPlaces(); });
+      els.placeVisitWantBtn.addEventListener("click", () => { state.placeVisitFilter = "want"; renderPlaces(); });
+      els.placeVisitDoneBtn.addEventListener("click", () => { state.placeVisitFilter = "done"; renderPlaces(); });
+
+      document.querySelectorAll("[data-age-filter]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          state.planAgeFilter = btn.dataset.ageFilter;
+          renderPlans();
+        });
+      });
+      document.querySelectorAll("[data-owner-filter]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          state.planOwnerFilter = btn.dataset.ownerFilter;
+          renderPlans();
+        });
+      });
+
+      els.placesList.addEventListener("click", async (e) => {
+        const target = e.target;
         if (!(target instanceof HTMLElement)) return;
-        const editId = target.getAttribute("data-edit-id");
-        if (editId) return startEditItem(editId);
-        const deleteId = target.getAttribute("data-delete-id");
-        if (deleteId) return openDeleteConfirm("place", deleteId);
-        const toggleId = target.getAttribute("data-toggle-id");
-        const nextVisited = target.getAttribute("data-next-visited");
-        if (toggleId && nextVisited !== null) {
-          await toggleVisited(toggleId, nextVisited === "true");
-        }
+        const editId = target.dataset.placeEdit;
+        const toggleId = target.dataset.placeToggle;
+        const deleteId = target.dataset.placeDelete;
+        if (editId) startPlaceEdit(editId);
+        if (toggleId) await toggleVisited(toggleId, target.dataset.nextVisited === "true");
+        if (deleteId) openDeleteModal({ kind: "place", id: deleteId });
       });
 
-      lifeListEl.addEventListener("click", (event) => {
-        const target = event.target;
+      els.plansList.addEventListener("click", (e) => {
+        const target = e.target;
         if (!(target instanceof HTMLElement)) return;
-        const editId = target.getAttribute("data-life-edit-id");
-        if (editId) return startEditLifePlan(editId);
-        const deleteId = target.getAttribute("data-life-delete-id");
-        if (deleteId) return openDeleteConfirm("life", deleteId);
+        const editId = target.dataset.planEdit;
+        const deleteId = target.dataset.planDelete;
+        if (editId) startPlanEdit(editId);
+        if (deleteId) openDeleteModal({ kind: "plan", id: deleteId });
       });
 
-      confirmDeleteYesEl.addEventListener("click", async () => {
-        if (pendingDelete.type === "place" && pendingDelete.id) {
-          await deleteItem(pendingDelete.id);
-        } else if (pendingDelete.type === "life" && pendingDelete.id) {
-          await deleteLifePlan(pendingDelete.id);
-        }
-        closeDeleteConfirm();
+      els.confirmDeleteBtn.addEventListener("click", confirmDelete);
+      els.cancelDeleteBtn.addEventListener("click", closeDeleteModal);
+      els.deleteModal.addEventListener("click", (e) => {
+        if (e.target === els.deleteModal) closeDeleteModal();
       });
 
-      confirmDeleteNoEl.addEventListener("click", closeDeleteConfirm);
-      deleteConfirmModalEl.addEventListener("click", (event) => {
-        if (event.target === deleteConfirmModalEl) closeDeleteConfirm();
-      });
+      els.settingsReloadBtn.addEventListener("click", () => reloadAllData(els.settingsStatus));
+      els.settingsGoHomeBtn.addEventListener("click", () => switchScreen("home"));
+      els.settingsGoPlacesBtn.addEventListener("click", () => switchScreen("places"));
+      els.settingsGoPlansBtn.addEventListener("click", () => switchScreen("plans"));
 
       supabase.auth.onAuthStateChange((_event, session) => {
-        if (session && session.user) {
+        if (session?.user) {
           handleSession();
         } else {
           showLoggedOut();
@@ -1726,16 +1609,13 @@
     }
 
     async function init() {
-      updateTabs();
-      updateLifeTabs();
-      updateAccountUi();
-      updatePlaceFormUi();
-      updateLifeFormUi();
-      setLifePlanMode("checking");
       bindEvents();
-      renderItems();
-      renderLifePlans();
-      renderHome();
+      switchScreen("home");
+      resetPlaceForm();
+      resetPlanForm();
+      updatePlaceFilterTabs();
+      updatePlanFilterTabs();
+      renderAll();
       await handleSession();
     }
 
