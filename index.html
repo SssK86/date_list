@@ -79,7 +79,8 @@
 
     input[type="text"],
     input[type="url"],
-    input[type="email"] {
+    input[type="email"],
+    select {
       width: 100%;
       padding: 12px;
       border: 1px solid #d9d9d9;
@@ -88,7 +89,8 @@
       background: #fff;
     }
 
-    input:focus {
+    input:focus,
+    select:focus {
       outline: none;
       border-color: #888;
     }
@@ -153,7 +155,8 @@
     .tabs {
       display: flex;
       gap: 8px;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
     }
 
     .tab-btn {
@@ -189,6 +192,17 @@
       font-size: 18px;
       line-height: 1.4;
       word-break: break-word;
+    }
+
+    .category-badge {
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #f0f0f0;
+      font-size: 12px;
+      font-weight: 700;
+      color: #333;
     }
 
     .url {
@@ -388,10 +402,23 @@
           <label for="shopUrl">URL</label>
           <input id="shopUrl" type="url" placeholder="https://example.com" />
         </div>
+        <div class="form-group">
+          <label for="shopCategory">カテゴリ</label>
+          <select id="shopCategory">
+            <option value="食">食</option>
+            <option value="旅行">旅行</option>
+          </select>
+        </div>
         <button class="add-btn" id="addBtn" type="button">追加する</button>
         <div class="sub-note">保存先は Supabase です。再読み込みで最新内容を確認できます。</div>
         <div id="itemStatus" class="status"></div>
       </section>
+
+      <div class="tabs">
+        <button id="tabAllCategory" class="tab-btn active" type="button">すべて</button>
+        <button id="tabFood" class="tab-btn" type="button">食</button>
+        <button id="tabTravel" class="tab-btn" type="button">旅行</button>
+      </div>
 
       <div class="tabs">
         <button id="tabWant" class="tab-btn active" type="button">行きたい</button>
@@ -404,7 +431,7 @@
 
   <div id="deleteConfirmModal" class="confirm-modal hidden">
     <div class="confirm-box">
-      <p class="confirm-text">このお店を削除していいですか？</p>
+      <p class="confirm-text">この項目を削除していいですか？</p>
       <div class="confirm-actions">
         <button id="confirmDeleteYes" class="danger-btn" type="button">はい</button>
         <button id="confirmDeleteNo" class="secondary-btn" type="button">いいえ</button>
@@ -424,6 +451,7 @@
     let currentUser = null;
     let items = [];
     let currentTab = "want";
+    let currentCategory = "all";
     let pendingDeleteId = null;
     let pendingEmail = "";
 
@@ -446,9 +474,14 @@
 
     const shopNameEl = document.getElementById("shopName");
     const shopUrlEl = document.getElementById("shopUrl");
+    const shopCategoryEl = document.getElementById("shopCategory");
     const addBtnEl = document.getElementById("addBtn");
     const itemStatusEl = document.getElementById("itemStatus");
     const listEl = document.getElementById("list");
+
+    const tabAllCategoryEl = document.getElementById("tabAllCategory");
+    const tabFoodEl = document.getElementById("tabFood");
+    const tabTravelEl = document.getElementById("tabTravel");
 
     const tabWantEl = document.getElementById("tabWant");
     const tabDoneEl = document.getElementById("tabDone");
@@ -500,13 +533,27 @@
     function updateTabs() {
       tabWantEl.classList.toggle("active", currentTab === "want");
       tabDoneEl.classList.toggle("active", currentTab === "done");
+
+      tabAllCategoryEl.classList.toggle("active", currentCategory === "all");
+      tabFoodEl.classList.toggle("active", currentCategory === "食");
+      tabTravelEl.classList.toggle("active", currentCategory === "旅行");
+    }
+
+    function getCategoryLabel(category) {
+      if (category === "食") return "食";
+      if (category === "旅行") return "旅行";
+      return "未設定";
     }
 
     function renderItems() {
-      const filteredItems = items.filter((item) => currentTab === "want" ? !item.visited : item.visited);
+      const filteredItems = items.filter((item) => {
+        const visitedMatch = currentTab === "want" ? !item.visited : item.visited;
+        const categoryMatch = currentCategory === "all" ? true : item.category === currentCategory;
+        return visitedMatch && categoryMatch;
+      });
 
       if (filteredItems.length === 0) {
-        listEl.innerHTML = `<div class="empty">${currentTab === "want" ? "まだ行きたいお店が登録されていません。" : "まだ行ったお店がありません。"}</div>`;
+        listEl.innerHTML = `<div class="empty">該当する項目がありません。</div>`;
         return;
       }
 
@@ -514,8 +561,11 @@
         const safeId = escapeHtml(item.id);
         const safeName = escapeHtml(item.name);
         const safeUrl = escapeHtml(item.url);
+        const safeCategory = escapeHtml(getCategoryLabel(item.category));
+
         return `
           <article class="card">
+            <div class="category-badge">${safeCategory}</div>
             <h2 class="card-title">${safeName}</h2>
             <a class="url" href="${safeUrl}" target="_blank" rel="noopener noreferrer">${safeUrl}</a>
             <div class="actions">
@@ -636,7 +686,7 @@
 
       const { data, error } = await supabase
         .from("items")
-        .select("id, name, url, visited, created_at")
+        .select("id, name, url, visited, category, created_at")
         .eq("list_id", SHARED_LIST_ID)
         .order("created_at", { ascending: false });
 
@@ -655,17 +705,22 @@
     async function addItem() {
       const name = shopNameEl.value.trim();
       const url = normalizeUrl(shopUrlEl.value);
+      const category = shopCategoryEl.value;
 
       if (!currentUser) {
         setStatus(itemStatusEl, "先にログインしてください。", "error");
         return;
       }
       if (!name) {
-        setStatus(itemStatusEl, "店名を入力してください。", "error");
+        setStatus(itemStatusEl, "名前を入力してください。", "error");
         return;
       }
       if (!url) {
         setStatus(itemStatusEl, "URLを入力してください。", "error");
+        return;
+      }
+      if (!category) {
+        setStatus(itemStatusEl, "カテゴリを選択してください。", "error");
         return;
       }
 
@@ -683,6 +738,7 @@
         list_id: SHARED_LIST_ID,
         name,
         url,
+        category,
         visited: false,
         created_by: currentUser.id
       });
@@ -696,6 +752,7 @@
 
       shopNameEl.value = "";
       shopUrlEl.value = "";
+      shopCategoryEl.value = "食";
       shopNameEl.focus();
       setStatus(itemStatusEl, "保存しました。", "success");
       await loadItems();
@@ -819,6 +876,24 @@
         pendingEmail = "";
         showLoggedOut();
         setStatus(authStatusEl, "ログアウトしました。", "success");
+      });
+
+      tabAllCategoryEl.addEventListener("click", () => {
+        currentCategory = "all";
+        updateTabs();
+        renderItems();
+      });
+
+      tabFoodEl.addEventListener("click", () => {
+        currentCategory = "食";
+        updateTabs();
+        renderItems();
+      });
+
+      tabTravelEl.addEventListener("click", () => {
+        currentCategory = "旅行";
+        updateTabs();
+        renderItems();
       });
 
       tabWantEl.addEventListener("click", () => {
