@@ -107,12 +107,14 @@
     .add-btn,
     .login-btn,
     .verify-btn,
-    .toggle-btn {
+    .toggle-btn,
+    .edit-btn {
       background: #222;
       color: #fff;
     }
 
-    .reload-btn {
+    .reload-btn,
+    .cancel-btn {
       background: #e0e0e0;
       color: #333;
     }
@@ -128,6 +130,11 @@
     .verify-btn {
       width: 100%;
       font-size: 16px;
+    }
+
+    .form-actions {
+      display: grid;
+      gap: 10px;
     }
 
     .sub-note {
@@ -346,7 +353,7 @@
     @media (max-width: 480px) {
       h1 { font-size: 24px; }
       .actions, .confirm-actions { flex-direction: column; }
-      .delete-btn, .toggle-btn, .confirm-actions button { width: 100%; }
+      .delete-btn, .toggle-btn, .edit-btn, .confirm-actions button { width: 100%; }
       .account-btn { max-width: 120px; }
     }
   </style>
@@ -394,14 +401,18 @@
 
     <section id="appPanel" class="hidden">
       <section class="form">
+        <h2 id="formTitle" class="panel-title">新しく追加</h2>
+
         <div class="form-group">
-          <label for="shopName">店名</label>
-          <input id="shopName" type="text" placeholder="例：焼肉〇〇" />
+          <label for="shopName">店名・場所名</label>
+          <input id="shopName" type="text" placeholder="例：焼肉〇〇 / 箱根 / 京都ホテル" />
         </div>
+
         <div class="form-group">
           <label for="shopUrl">URL</label>
           <input id="shopUrl" type="url" placeholder="https://example.com" />
         </div>
+
         <div class="form-group">
           <label for="shopCategory">カテゴリ</label>
           <select id="shopCategory">
@@ -409,7 +420,12 @@
             <option value="旅行">旅行</option>
           </select>
         </div>
-        <button class="add-btn" id="addBtn" type="button">追加する</button>
+
+        <div class="form-actions">
+          <button class="add-btn" id="saveBtn" type="button">追加する</button>
+          <button class="cancel-btn hidden" id="cancelEditBtn" type="button">編集をキャンセル</button>
+        </div>
+
         <div class="sub-note">保存先は Supabase です。再読み込みで最新内容を確認できます。</div>
         <div id="itemStatus" class="status"></div>
       </section>
@@ -454,6 +470,7 @@
     let currentCategory = "all";
     let pendingDeleteId = null;
     let pendingEmail = "";
+    let editingItemId = null;
 
     const authPanelEl = document.getElementById("authPanel");
     const emailInputEl = document.getElementById("emailInput");
@@ -472,10 +489,12 @@
     const reloadBtnEl = document.getElementById("reloadBtn");
     const logoutBtnEl = document.getElementById("logoutBtn");
 
+    const formTitleEl = document.getElementById("formTitle");
     const shopNameEl = document.getElementById("shopName");
     const shopUrlEl = document.getElementById("shopUrl");
     const shopCategoryEl = document.getElementById("shopCategory");
-    const addBtnEl = document.getElementById("addBtn");
+    const saveBtnEl = document.getElementById("saveBtn");
+    const cancelEditBtnEl = document.getElementById("cancelEditBtn");
     const itemStatusEl = document.getElementById("itemStatus");
     const listEl = document.getElementById("list");
 
@@ -533,10 +552,24 @@
     function updateTabs() {
       tabWantEl.classList.toggle("active", currentTab === "want");
       tabDoneEl.classList.toggle("active", currentTab === "done");
-
       tabAllCategoryEl.classList.toggle("active", currentCategory === "all");
       tabFoodEl.classList.toggle("active", currentCategory === "食");
       tabTravelEl.classList.toggle("active", currentCategory === "旅行");
+    }
+
+    function updateFormUi() {
+      const isEditing = !!editingItemId;
+      formTitleEl.textContent = isEditing ? "リストを編集" : "新しく追加";
+      saveBtnEl.textContent = isEditing ? "更新する" : "追加する";
+      cancelEditBtnEl.classList.toggle("hidden", !isEditing);
+    }
+
+    function resetForm() {
+      editingItemId = null;
+      shopNameEl.value = "";
+      shopUrlEl.value = "";
+      shopCategoryEl.value = "食";
+      updateFormUi();
     }
 
     function getCategoryLabel(category) {
@@ -569,6 +602,7 @@
             <h2 class="card-title">${safeName}</h2>
             <a class="url" href="${safeUrl}" target="_blank" rel="noopener noreferrer">${safeUrl}</a>
             <div class="actions">
+              <button class="edit-btn" type="button" data-edit-id="${safeId}">編集</button>
               <button class="toggle-btn" type="button" data-toggle-id="${safeId}" data-next-visited="${item.visited ? "false" : "true"}">${item.visited ? "行きたいに戻す" : "行った"}</button>
               <button class="delete-btn" type="button" data-delete-id="${safeId}">削除</button>
             </div>
@@ -583,6 +617,7 @@
       authPanelEl.classList.remove("hidden");
       appPanelEl.classList.add("hidden");
       updateAccountUi();
+      resetForm();
       renderItems();
     }
 
@@ -702,7 +737,29 @@
       renderItems();
     }
 
-    async function addItem() {
+    function startEditItem(id) {
+      const item = items.find((row) => row.id === id);
+      if (!item) {
+        setStatus(itemStatusEl, "編集対象が見つかりません。", "error");
+        return;
+      }
+
+      editingItemId = id;
+      shopNameEl.value = item.name || "";
+      shopUrlEl.value = item.url || "";
+      shopCategoryEl.value = item.category || "食";
+      updateFormUi();
+      setStatus(itemStatusEl, "編集モードです。内容を修正して更新してください。", "");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      shopNameEl.focus();
+    }
+
+    function cancelEdit() {
+      resetForm();
+      setStatus(itemStatusEl, "編集をキャンセルしました。", "");
+    }
+
+    async function saveItem() {
       const name = shopNameEl.value.trim();
       const url = normalizeUrl(shopUrlEl.value);
       const category = shopCategoryEl.value;
@@ -731,30 +788,50 @@
         return;
       }
 
-      addBtnEl.disabled = true;
-      setStatus(itemStatusEl, "保存中...", "");
+      saveBtnEl.disabled = true;
+      cancelEditBtnEl.disabled = true;
+      setStatus(itemStatusEl, editingItemId ? "更新中..." : "保存中...", "");
 
-      const { error } = await supabase.from("items").insert({
-        list_id: SHARED_LIST_ID,
-        name,
-        url,
-        category,
-        visited: false,
-        created_by: currentUser.id
-      });
+      let error = null;
 
-      addBtnEl.disabled = false;
+      if (editingItemId) {
+        const result = await supabase
+          .from("items")
+          .update({
+            name,
+            url,
+            category
+          })
+          .eq("id", editingItemId)
+          .eq("list_id", SHARED_LIST_ID);
+
+        error = result.error;
+      } else {
+        const result = await supabase
+          .from("items")
+          .insert({
+            list_id: SHARED_LIST_ID,
+            name,
+            url,
+            category,
+            visited: false,
+            created_by: currentUser.id
+          });
+
+        error = result.error;
+      }
+
+      saveBtnEl.disabled = false;
+      cancelEditBtnEl.disabled = false;
 
       if (error) {
-        setStatus(itemStatusEl, "保存に失敗しました: " + error.message, "error");
+        setStatus(itemStatusEl, (editingItemId ? "更新" : "保存") + "に失敗しました: " + error.message, "error");
         return;
       }
 
-      shopNameEl.value = "";
-      shopUrlEl.value = "";
-      shopCategoryEl.value = "食";
-      shopNameEl.focus();
-      setStatus(itemStatusEl, "保存しました。", "success");
+      const wasEditing = !!editingItemId;
+      resetForm();
+      setStatus(itemStatusEl, wasEditing ? "更新しました。" : "保存しました。", "success");
       await loadItems();
     }
 
@@ -770,6 +847,10 @@
       if (error) {
         setStatus(itemStatusEl, "更新に失敗しました: " + error.message, "error");
         return;
+      }
+
+      if (editingItemId === id) {
+        resetForm();
       }
 
       setStatus(itemStatusEl, "更新しました。", "success");
@@ -798,6 +879,10 @@
       if (error) {
         setStatus(itemStatusEl, "削除に失敗しました: " + error.message, "error");
         return;
+      }
+
+      if (editingItemId === id) {
+        resetForm();
       }
 
       setStatus(itemStatusEl, "削除しました。", "success");
@@ -852,12 +937,14 @@
         if (event.key === "Enter") verifyOtpCode();
       });
 
-      addBtnEl.addEventListener("click", addItem);
+      saveBtnEl.addEventListener("click", saveItem);
+      cancelEditBtnEl.addEventListener("click", cancelEdit);
+
       shopNameEl.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") addItem();
+        if (event.key === "Enter") saveItem();
       });
       shopUrlEl.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") addItem();
+        if (event.key === "Enter") saveItem();
       });
 
       reloadBtnEl.addEventListener("click", async () => {
@@ -912,6 +999,12 @@
         const target = event.target;
         if (!(target instanceof HTMLElement)) return;
 
+        const editId = target.getAttribute("data-edit-id");
+        if (editId) {
+          startEditItem(editId);
+          return;
+        }
+
         const deleteId = target.getAttribute("data-delete-id");
         if (deleteId) {
           openDeleteConfirm(deleteId);
@@ -949,6 +1042,7 @@
     async function init() {
       updateTabs();
       updateAccountUi();
+      updateFormUi();
       bindEvents();
       await handleSession();
     }
