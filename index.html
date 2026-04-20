@@ -562,10 +562,12 @@
               <button class="tab-btn" id="placeVisitDoneBtn" type="button">行った</button>
             </div>
 
-            <div class="pill-row" style="margin-bottom:12px;">
-              <span class="pill">行きたい: <span id="summaryWant" style="margin-left:4px;">0</span></span>
-              <span class="pill">行った: <span id="summaryDone" style="margin-left:4px;">0</span></span>
-            </div>
+<div class="pill-row" style="margin-bottom:12px;">
+  <span class="pill">食 行きたい: <span id="summaryFoodWant" style="margin-left:4px;">0</span></span>
+  <span class="pill">食 行った: <span id="summaryFoodDone" style="margin-left:4px;">0</span></span>
+  <span class="pill">旅行 行きたい: <span id="summaryTravelWant" style="margin-left:4px;">0</span></span>
+  <span class="pill">旅行 行った: <span id="summaryTravelDone" style="margin-left:4px;">0</span></span>
+</div>
 
             <section id="placesList" class="list"></section>
           </section>
@@ -755,8 +757,10 @@
       fab: $("fab"),
       bottomNav: $("bottomNav"),
 
-      summaryWant: $("summaryWant"),
-      summaryDone: $("summaryDone"),
+summaryFoodWant: $("summaryFoodWant"),
+summaryFoodDone: $("summaryFoodDone"),
+summaryTravelWant: $("summaryTravelWant"),
+summaryTravelDone: $("summaryTravelDone"),
 
       placeFormTitle: $("placeFormTitle"),
       placeNameInput: $("placeNameInput"),
@@ -951,10 +955,15 @@
     function renderPlaces() {
       updatePlaceFilterTabs();
 
-      const wantCount = state.places.filter((item) => !item.visited).length;
-      const doneCount = state.places.filter((item) => !!item.visited).length;
-      els.summaryWant.textContent = String(wantCount);
-      els.summaryDone.textContent = String(doneCount);
+const foodWantCount = state.places.filter((item) => item.category === "食" && !item.visited).length;
+const foodDoneCount = state.places.filter((item) => item.category === "食" && !!item.visited).length;
+const travelWantCount = state.places.filter((item) => item.category === "旅行" && !item.visited).length;
+const travelDoneCount = state.places.filter((item) => item.category === "旅行" && !!item.visited).length;
+
+els.summaryFoodWant.textContent = String(foodWantCount);
+els.summaryFoodDone.textContent = String(foodDoneCount);
+els.summaryTravelWant.textContent = String(travelWantCount);
+els.summaryTravelDone.textContent = String(travelDoneCount);
 
       const rows = getFilteredPlaces();
       if (rows.length === 0) {
