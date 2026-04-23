@@ -178,7 +178,8 @@
     .secondary-btn,
     .danger-btn,
     .primary-btn,
-    .ghost-btn {
+    .ghost-btn,
+    .amount-chip {
       border: none;
       border-radius: 999px;
       padding: 10px 14px;
@@ -257,7 +258,8 @@
 
     .inline-actions,
     .card-actions,
-    .modal-actions {
+    .modal-actions,
+    .amount-selector {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
@@ -267,6 +269,17 @@
     .card-actions > button,
     .modal-actions > button {
       flex: 1 1 140px;
+    }
+
+    .amount-chip {
+      background: #e5e7eb;
+      color: #374151;
+      min-width: 70px;
+    }
+
+    .amount-chip.active {
+      background: var(--primary);
+      color: #fff;
     }
 
     .status {
@@ -356,7 +369,7 @@
       transform: translateX(-50%);
       width: min(760px, 100%);
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       background: rgba(255, 255, 255, 0.96);
       backdrop-filter: blur(10px);
       border-top: 1px solid var(--line);
@@ -465,6 +478,18 @@
       line-height: 1.5;
     }
 
+    .freezer-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .freezer-row .section-note {
+      margin: 0;
+    }
+
     @media (max-width: 560px) {
       h1 { font-size: 23px; }
       .topbar { padding-inline: 12px; }
@@ -480,7 +505,7 @@
       <div class="topbar-row">
         <div>
           <h1>ふたりの未来リスト</h1>
-          <div class="subtitle">行きたい場所とライフプランをまとめて管理</div>
+          <div class="subtitle">行きたい場所とライフプランと冷凍庫メモをまとめて管理</div>
         </div>
         <div class="account-wrap">
           <button id="accountBtn" class="account-btn hidden" type="button" aria-label="アカウントメニューを開く">
@@ -562,12 +587,12 @@
               <button class="tab-btn" id="placeVisitDoneBtn" type="button">行った</button>
             </div>
 
-<div class="pill-row" style="margin-bottom:12px;">
-  <span class="pill">食 行きたい: <span id="summaryFoodWant" style="margin-left:4px;">0</span></span>
-  <span class="pill">食 行った: <span id="summaryFoodDone" style="margin-left:4px;">0</span></span>
-  <span class="pill">旅行 行きたい: <span id="summaryTravelWant" style="margin-left:4px;">0</span></span>
-  <span class="pill">旅行 行った: <span id="summaryTravelDone" style="margin-left:4px;">0</span></span>
-</div>
+            <div class="pill-row" style="margin-bottom:12px;">
+              <span class="pill">食 行きたい: <span id="summaryFoodWant" style="margin-left:4px;">0</span></span>
+              <span class="pill">食 行った: <span id="summaryFoodDone" style="margin-left:4px;">0</span></span>
+              <span class="pill">旅行 行きたい: <span id="summaryTravelWant" style="margin-left:4px;">0</span></span>
+              <span class="pill">旅行 行った: <span id="summaryTravelDone" style="margin-left:4px;">0</span></span>
+            </div>
 
             <section id="placesList" class="list"></section>
           </section>
@@ -663,6 +688,48 @@
             <section id="plansList" class="list"></section>
           </section>
         </section>
+
+        <section id="screen-freezer" class="screen">
+          <section class="panel">
+            <h2 id="freezerFormTitle" class="section-title">冷凍庫メモを追加</h2>
+            <p class="section-note">食材名と大雑把な量だけを記録します。量はデフォルトで「中」です。</p>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="freezerNameInput">食材名</label>
+                <input id="freezerNameInput" type="text" placeholder="例：餃子、鶏むね肉、ご飯" />
+              </div>
+
+              <div class="form-group">
+                <label>量</label>
+                <div class="amount-selector">
+                  <button id="amountSmallBtn" class="amount-chip" type="button" data-amount-type="small">小</button>
+                  <button id="amountMediumBtn" class="amount-chip active" type="button" data-amount-type="medium">中</button>
+                  <button id="amountLargeBtn" class="amount-chip" type="button" data-amount-type="large">多</button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="freezerAmountTextInput">量の自由入力（任意）</label>
+                <input id="freezerAmountTextInput" type="text" placeholder="例：2食分、3個、半分" />
+              </div>
+
+              <div class="inline-actions">
+                <button id="saveFreezerBtn" class="primary-btn" type="button">追加する</button>
+                <button id="cancelFreezerEditBtn" class="secondary-btn hidden" type="button">編集をキャンセル</button>
+              </div>
+            </div>
+            <div class="small-note">保存先は Supabase の freezer_items テーブルです。</div>
+            <div id="freezerStatus" class="status"></div>
+          </section>
+
+          <section class="panel">
+            <div class="freezer-row">
+              <h2 class="section-title" style="margin-bottom:0;">現在入っているもの</h2>
+              <div class="section-note">タップで編集、削除可能</div>
+            </div>
+            <section id="freezerList" class="list"></section>
+          </section>
+        </section>
       </section>
     </main>
 
@@ -677,6 +744,10 @@
         <span class="nav-icon">🗂</span>
         <span>ライフプラン</span>
       </button>
+      <button class="nav-btn" data-screen="freezer" type="button">
+        <span class="nav-icon">🧊</span>
+        <span>冷凍庫</span>
+      </button>
     </nav>
   </div>
 
@@ -690,6 +761,10 @@
       <button id="openPlanFormBtn" class="action-choice" type="button">
         <strong>ライフプランを追加</strong>
         <span>年代ごとの目標や将来やりたいことを登録します。</span>
+      </button>
+      <button id="openFreezerFormBtn" class="action-choice" type="button">
+        <strong>冷凍庫メモを追加</strong>
+        <span>食材名と大雑把な量を登録します。</span>
       </button>
       <div class="modal-actions">
         <button id="closeFabModalBtn" class="secondary-btn" type="button">閉じる</button>
@@ -723,12 +798,15 @@
       currentScreen: "places",
       places: [],
       plans: [],
+      freezerItems: [],
       placeVisitFilter: "want",
       placeCategoryFilter: "all",
       planAgeFilter: "all",
       planOwnerFilter: "all",
       editingPlaceId: null,
       editingPlanId: null,
+      editingFreezerId: null,
+      freezerAmountType: "medium",
       deleteTarget: null,
       pendingEmail: ""
     };
@@ -756,10 +834,10 @@
       fab: $("fab"),
       bottomNav: $("bottomNav"),
 
-summaryFoodWant: $("summaryFoodWant"),
-summaryFoodDone: $("summaryFoodDone"),
-summaryTravelWant: $("summaryTravelWant"),
-summaryTravelDone: $("summaryTravelDone"),
+      summaryFoodWant: $("summaryFoodWant"),
+      summaryFoodDone: $("summaryFoodDone"),
+      summaryTravelWant: $("summaryTravelWant"),
+      summaryTravelDone: $("summaryTravelDone"),
 
       placeFormTitle: $("placeFormTitle"),
       placeNameInput: $("placeNameInput"),
@@ -788,9 +866,21 @@ summaryTravelDone: $("summaryTravelDone"),
       planStatus: $("planStatus"),
       plansList: $("plansList"),
 
+      freezerFormTitle: $("freezerFormTitle"),
+      freezerNameInput: $("freezerNameInput"),
+      freezerAmountTextInput: $("freezerAmountTextInput"),
+      saveFreezerBtn: $("saveFreezerBtn"),
+      cancelFreezerEditBtn: $("cancelFreezerEditBtn"),
+      freezerStatus: $("freezerStatus"),
+      freezerList: $("freezerList"),
+      amountSmallBtn: $("amountSmallBtn"),
+      amountMediumBtn: $("amountMediumBtn"),
+      amountLargeBtn: $("amountLargeBtn"),
+
       fabModal: $("fabModal"),
       openPlaceFormBtn: $("openPlaceFormBtn"),
       openPlanFormBtn: $("openPlanFormBtn"),
+      openFreezerFormBtn: $("openFreezerFormBtn"),
       closeFabModalBtn: $("closeFabModalBtn"),
 
       deleteModal: $("deleteModal"),
@@ -801,7 +891,8 @@ summaryTravelDone: $("summaryTravelDone"),
 
     const screenEls = {
       places: $("screen-places"),
-      plans: $("screen-plans")
+      plans: $("screen-plans"),
+      freezer: $("screen-freezer")
     };
 
     function setStatus(el, message = "", type = "") {
@@ -847,12 +938,37 @@ summaryTravelDone: $("summaryTravelDone"),
       return String(value ?? "");
     }
 
+    function freezerAmountLabel(value) {
+      if (value === "small") return "小";
+      if (value === "medium") return "中";
+      if (value === "large") return "多";
+      return "中";
+    }
+
+    function freezerDisplayAmount(item) {
+      const text = String(item.amount_text || "").trim();
+      return text || freezerAmountLabel(item.amount_type);
+    }
+
+    function updateFreezerAmountButtons() {
+      document.querySelectorAll("[data-amount-type]").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.amountType === state.freezerAmountType);
+      });
+    }
+
+    function setFreezerAmountType(type) {
+      state.freezerAmountType = type;
+      updateFreezerAmountButtons();
+    }
+
     function showLoggedOut() {
       state.user = null;
       state.places = [];
       state.plans = [];
+      state.freezerItems = [];
       state.editingPlaceId = null;
       state.editingPlanId = null;
+      state.editingFreezerId = null;
       els.authPanel.classList.remove("hidden");
       els.appPanel.classList.add("hidden");
       els.bottomNav.classList.add("hidden");
@@ -906,6 +1022,8 @@ summaryTravelDone: $("summaryTravelDone"),
     function updateFormTitles() {
       const placeEditing = !!state.editingPlaceId;
       const planEditing = !!state.editingPlanId;
+      const freezerEditing = !!state.editingFreezerId;
+
       els.placeFormTitle.textContent = placeEditing ? "行きたい場所を編集" : "行きたい場所を追加";
       els.savePlaceBtn.textContent = placeEditing ? "更新する" : "追加する";
       els.cancelPlaceEditBtn.classList.toggle("hidden", !placeEditing);
@@ -913,6 +1031,10 @@ summaryTravelDone: $("summaryTravelDone"),
       els.planFormTitle.textContent = planEditing ? "ライフプランを編集" : "ライフプランを追加";
       els.savePlanBtn.textContent = planEditing ? "更新する" : "追加する";
       els.cancelPlanEditBtn.classList.toggle("hidden", !planEditing);
+
+      els.freezerFormTitle.textContent = freezerEditing ? "冷凍庫メモを編集" : "冷凍庫メモを追加";
+      els.saveFreezerBtn.textContent = freezerEditing ? "更新する" : "追加する";
+      els.cancelFreezerEditBtn.classList.toggle("hidden", !freezerEditing);
     }
 
     function resetPlaceForm() {
@@ -935,6 +1057,14 @@ summaryTravelDone: $("summaryTravelDone"),
       updateFormTitles();
     }
 
+    function resetFreezerForm() {
+      state.editingFreezerId = null;
+      els.freezerNameInput.value = "";
+      els.freezerAmountTextInput.value = "";
+      setFreezerAmountType("medium");
+      updateFormTitles();
+    }
+
     function getFilteredPlaces() {
       return state.places.filter((item) => {
         const visitMatch = state.placeVisitFilter === "want" ? !item.visited : !!item.visited;
@@ -954,15 +1084,15 @@ summaryTravelDone: $("summaryTravelDone"),
     function renderPlaces() {
       updatePlaceFilterTabs();
 
-const foodWantCount = state.places.filter((item) => item.category === "食" && !item.visited).length;
-const foodDoneCount = state.places.filter((item) => item.category === "食" && !!item.visited).length;
-const travelWantCount = state.places.filter((item) => item.category === "旅行" && !item.visited).length;
-const travelDoneCount = state.places.filter((item) => item.category === "旅行" && !!item.visited).length;
+      const foodWantCount = state.places.filter((item) => item.category === "食" && !item.visited).length;
+      const foodDoneCount = state.places.filter((item) => item.category === "食" && !!item.visited).length;
+      const travelWantCount = state.places.filter((item) => item.category === "旅行" && !item.visited).length;
+      const travelDoneCount = state.places.filter((item) => item.category === "旅行" && !!item.visited).length;
 
-els.summaryFoodWant.textContent = String(foodWantCount);
-els.summaryFoodDone.textContent = String(foodDoneCount);
-els.summaryTravelWant.textContent = String(travelWantCount);
-els.summaryTravelDone.textContent = String(travelDoneCount);
+      els.summaryFoodWant.textContent = String(foodWantCount);
+      els.summaryFoodDone.textContent = String(foodDoneCount);
+      els.summaryTravelWant.textContent = String(travelWantCount);
+      els.summaryTravelDone.textContent = String(travelDoneCount);
 
       const rows = getFilteredPlaces();
       if (rows.length === 0) {
@@ -1013,10 +1143,33 @@ els.summaryTravelDone.textContent = String(travelDoneCount);
       `).join("");
     }
 
+    function renderFreezer() {
+      updateFreezerAmountButtons();
+      const rows = state.freezerItems;
+      if (rows.length === 0) {
+        els.freezerList.innerHTML = `<div class="empty-state">冷凍庫メモはまだありません。</div>`;
+        return;
+      }
+      els.freezerList.innerHTML = rows.map((item) => `
+        <article class="card">
+          <div class="pill-row">
+            <span class="pill primary">冷凍庫</span>
+            <span class="pill">${escapeHtml(freezerDisplayAmount(item))}</span>
+          </div>
+          <h3 class="card-title">${escapeHtml(item.name)}</h3>
+          <div class="card-actions">
+            <button class="secondary-btn" type="button" data-freezer-edit="${escapeHtml(item.id)}">編集</button>
+            <button class="danger-btn" type="button" data-freezer-delete="${escapeHtml(item.id)}">削除</button>
+          </div>
+        </article>
+      `).join("");
+    }
+
     function renderAll() {
       updateFormTitles();
       renderPlaces();
       renderPlans();
+      renderFreezer();
     }
 
     async function loadPlaces() {
@@ -1041,6 +1194,17 @@ els.summaryTravelDone.textContent = String(travelDoneCount);
       state.plans = Array.isArray(data) ? data : [];
     }
 
+    async function loadFreezerItems() {
+      const { data, error } = await supabase
+        .from("freezer_items")
+        .select("id, name, amount_type, amount_text, created_at")
+        .eq("list_id", SHARED_LIST_ID)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      state.freezerItems = Array.isArray(data) ? data : [];
+    }
+
     async function verifyMembership(user) {
       const { data, error } = await supabase
         .from("list_members")
@@ -1056,7 +1220,7 @@ els.summaryTravelDone.textContent = String(travelDoneCount);
     async function reloadAllData(statusEl = null) {
       try {
         if (statusEl) setStatus(statusEl, "再読み込み中...");
-        await Promise.all([loadPlaces(), loadPlans()]);
+        await Promise.all([loadPlaces(), loadPlans(), loadFreezerItems()]);
         renderAll();
         if (statusEl) setStatus(statusEl, "再読み込みしました。", "success");
       } catch (error) {
@@ -1241,6 +1405,56 @@ els.summaryTravelDone.textContent = String(travelDoneCount);
       setStatus(els.planStatus, wasEditing ? "更新しました。" : "保存しました。", "success");
     }
 
+    async function saveFreezerItem() {
+      const name = els.freezerNameInput.value.trim();
+      const amount_type = state.freezerAmountType || "medium";
+      const amount_text = els.freezerAmountTextInput.value.trim();
+
+      if (!state.user) {
+        setStatus(els.freezerStatus, "先にログインしてください。", "error");
+        return;
+      }
+      if (!name) {
+        setStatus(els.freezerStatus, "食材名を入力してください。", "error");
+        return;
+      }
+
+      const payload = {
+        list_id: SHARED_LIST_ID,
+        name,
+        amount_type,
+        amount_text,
+        created_by: state.user.id
+      };
+
+      els.saveFreezerBtn.disabled = true;
+      setStatus(els.freezerStatus, state.editingFreezerId ? "更新中..." : "保存中...");
+
+      let error = null;
+      if (state.editingFreezerId) {
+        const updatePayload = { ...payload };
+        delete updatePayload.created_by;
+        ({ error } = await supabase
+          .from("freezer_items")
+          .update(updatePayload)
+          .eq("id", state.editingFreezerId)
+          .eq("list_id", SHARED_LIST_ID));
+      } else {
+        ({ error } = await supabase.from("freezer_items").insert(payload));
+      }
+
+      els.saveFreezerBtn.disabled = false;
+      if (error) {
+        setStatus(els.freezerStatus, `保存に失敗しました: ${error.message}`, "error");
+        return;
+      }
+
+      const wasEditing = !!state.editingFreezerId;
+      resetFreezerForm();
+      await reloadAllData();
+      setStatus(els.freezerStatus, wasEditing ? "更新しました。" : "保存しました。", "success");
+    }
+
     function startPlaceEdit(id) {
       const item = state.places.find((row) => row.id === id);
       if (!item) return;
@@ -1271,6 +1485,19 @@ els.summaryTravelDone.textContent = String(travelDoneCount);
       setStatus(els.planStatus, "編集モードです。", "warning");
     }
 
+    function startFreezerEdit(id) {
+      const item = state.freezerItems.find((row) => row.id === id);
+      if (!item) return;
+      state.editingFreezerId = id;
+      els.freezerNameInput.value = item.name || "";
+      els.freezerAmountTextInput.value = item.amount_text || "";
+      setFreezerAmountType(item.amount_type || "medium");
+      updateFormTitles();
+      switchScreen("freezer");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setStatus(els.freezerStatus, "編集モードです。", "warning");
+    }
+
     async function toggleVisited(id, nextVisited) {
       setStatus(els.placeStatus, "更新中...");
       const { error } = await supabase
@@ -1288,7 +1515,13 @@ els.summaryTravelDone.textContent = String(travelDoneCount);
 
     function openDeleteModal(target) {
       state.deleteTarget = target;
-      els.deleteModalText.textContent = `${target.kind === "place" ? "この行きたい場所" : "このライフプラン"}を削除しますか？`;
+      if (target.kind === "place") {
+        els.deleteModalText.textContent = "この行きたい場所を削除しますか？";
+      } else if (target.kind === "plan") {
+        els.deleteModalText.textContent = "このライフプランを削除しますか？";
+      } else {
+        els.deleteModalText.textContent = "この冷凍庫メモを削除しますか？";
+      }
       els.deleteModal.classList.remove("hidden");
     }
 
@@ -1300,8 +1533,8 @@ els.summaryTravelDone.textContent = String(travelDoneCount);
     async function confirmDelete() {
       if (!state.deleteTarget) return;
       const { kind, id } = state.deleteTarget;
-      const table = kind === "place" ? "items" : "life_plans";
-      const statusEl = kind === "place" ? els.placeStatus : els.planStatus;
+      const table = kind === "place" ? "items" : kind === "plan" ? "life_plans" : "freezer_items";
+      const statusEl = kind === "place" ? els.placeStatus : kind === "plan" ? els.planStatus : els.freezerStatus;
       setStatus(statusEl, "削除中...");
       const { error } = await supabase.from(table).delete().eq("id", id).eq("list_id", SHARED_LIST_ID);
       if (error) {
@@ -1311,6 +1544,7 @@ els.summaryTravelDone.textContent = String(travelDoneCount);
       }
       if (kind === "place" && state.editingPlaceId === id) resetPlaceForm();
       if (kind === "plan" && state.editingPlanId === id) resetPlanForm();
+      if (kind === "freezer" && state.editingFreezerId === id) resetFreezerForm();
       await reloadAllData();
       setStatus(statusEl, "削除しました。", "success");
       closeDeleteModal();
@@ -1339,7 +1573,12 @@ els.summaryTravelDone.textContent = String(travelDoneCount);
 
       els.reloadBtn.addEventListener("click", async () => {
         els.accountMenu.classList.add("hidden");
-        await reloadAllData(els.placeStatus);
+        const statusEl = state.currentScreen === "plans"
+          ? els.planStatus
+          : state.currentScreen === "freezer"
+            ? els.freezerStatus
+            : els.placeStatus;
+        await reloadAllData(statusEl);
       });
 
       els.logoutBtn.addEventListener("click", async () => {
@@ -1355,6 +1594,10 @@ els.summaryTravelDone.textContent = String(travelDoneCount);
 
       document.querySelectorAll(".nav-btn").forEach((btn) => {
         btn.addEventListener("click", () => switchScreen(btn.dataset.screen));
+      });
+
+      document.querySelectorAll("[data-amount-type]").forEach((btn) => {
+        btn.addEventListener("click", () => setFreezerAmountType(btn.dataset.amountType));
       });
 
       els.fab.addEventListener("click", openFabModal);
@@ -1377,6 +1620,13 @@ els.summaryTravelDone.textContent = String(travelDoneCount);
         els.planTitleInput.focus();
       });
 
+      els.openFreezerFormBtn.addEventListener("click", () => {
+        closeFabModal();
+        switchScreen("freezer");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        els.freezerNameInput.focus();
+      });
+
       els.savePlaceBtn.addEventListener("click", savePlace);
       els.cancelPlaceEditBtn.addEventListener("click", () => {
         resetPlaceForm();
@@ -1387,6 +1637,12 @@ els.summaryTravelDone.textContent = String(travelDoneCount);
       els.cancelPlanEditBtn.addEventListener("click", () => {
         resetPlanForm();
         setStatus(els.planStatus, "編集をキャンセルしました。");
+      });
+
+      els.saveFreezerBtn.addEventListener("click", saveFreezerItem);
+      els.cancelFreezerEditBtn.addEventListener("click", () => {
+        resetFreezerForm();
+        setStatus(els.freezerStatus, "編集をキャンセルしました。");
       });
 
       els.placeCategoryAllBtn.addEventListener("click", () => { state.placeCategoryFilter = "all"; renderPlaces(); });
@@ -1429,6 +1685,15 @@ els.summaryTravelDone.textContent = String(travelDoneCount);
         if (deleteId) openDeleteModal({ kind: "plan", id: deleteId });
       });
 
+      els.freezerList.addEventListener("click", (e) => {
+        const target = e.target;
+        if (!(target instanceof HTMLElement)) return;
+        const editId = target.dataset.freezerEdit;
+        const deleteId = target.dataset.freezerDelete;
+        if (editId) startFreezerEdit(editId);
+        if (deleteId) openDeleteModal({ kind: "freezer", id: deleteId });
+      });
+
       els.confirmDeleteBtn.addEventListener("click", confirmDelete);
       els.cancelDeleteBtn.addEventListener("click", closeDeleteModal);
       els.deleteModal.addEventListener("click", (e) => {
@@ -1449,6 +1714,7 @@ els.summaryTravelDone.textContent = String(travelDoneCount);
       switchScreen("places");
       resetPlaceForm();
       resetPlanForm();
+      resetFreezerForm();
       updatePlaceFilterTabs();
       updatePlanFilterTabs();
       renderAll();
