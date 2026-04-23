@@ -179,7 +179,8 @@
     .danger-btn,
     .primary-btn,
     .ghost-btn,
-    .amount-chip {
+    .count-btn,
+    .mini-btn {
       border: none;
       border-radius: 999px;
       padding: 10px 14px;
@@ -205,7 +206,8 @@
     }
 
     .secondary-btn,
-    .ghost-btn {
+    .ghost-btn,
+    .mini-btn {
       background: #e5e7eb;
       color: #374151;
     }
@@ -225,6 +227,12 @@
       gap: 6px;
     }
 
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 120px;
+      gap: 12px;
+    }
+
     label {
       font-size: 14px;
       font-weight: 700;
@@ -233,6 +241,7 @@
     input[type="text"],
     input[type="url"],
     input[type="email"],
+    input[type="number"],
     textarea,
     select {
       width: 100%;
@@ -259,7 +268,7 @@
     .inline-actions,
     .card-actions,
     .modal-actions,
-    .amount-selector {
+    .counter-row {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
@@ -269,17 +278,6 @@
     .card-actions > button,
     .modal-actions > button {
       flex: 1 1 140px;
-    }
-
-    .amount-chip {
-      background: #e5e7eb;
-      color: #374151;
-      min-width: 70px;
-    }
-
-    .amount-chip.active {
-      background: var(--primary);
-      color: #fff;
     }
 
     .status {
@@ -490,12 +488,46 @@
       margin: 0;
     }
 
+    .freezer-card-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .count-btn {
+      min-width: 46px;
+      background: var(--primary);
+      color: #fff;
+      padding: 10px 0;
+    }
+
+    .count-display {
+      min-width: 90px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 800;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: #f3f4f6;
+      color: var(--text);
+    }
+
+    .mini-btn {
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+
     @media (max-width: 560px) {
       h1 { font-size: 23px; }
       .topbar { padding-inline: 12px; }
       .content { padding-inline: 12px; }
       .account-btn { max-width: 135px; }
       .fab { right: 12px; }
+      .two-col { grid-template-columns: 1fr; }
+      .freezer-card-bottom { align-items: stretch; }
     }
   </style>
 </head>
@@ -691,26 +723,23 @@
 
         <section id="screen-freezer" class="screen">
           <section class="panel">
-            <h2 id="freezerFormTitle" class="section-title">冷凍庫メモを追加</h2>
-            <p class="section-note">食材名と大雑把な量だけを記録します。量はデフォルトで「中」です。</p>
+            <h2 id="freezerFormTitle" class="section-title">冷凍庫ストックを追加</h2>
+            <p class="section-note">食材名・個数・単位を記録します。一覧の − / ＋ で使った分だけ増減できます。</p>
             <div class="form-grid">
               <div class="form-group">
                 <label for="freezerNameInput">食材名</label>
-                <input id="freezerNameInput" type="text" placeholder="例：豚肉、ご飯" />
+                <input id="freezerNameInput" type="text" placeholder="例：冷凍ご飯、餃子、うどん" />
               </div>
 
-              <div class="form-group">
-                <label>量</label>
-                <div class="amount-selector">
-                  <button id="amountSmallBtn" class="amount-chip" type="button" data-amount-type="small">小</button>
-                  <button id="amountMediumBtn" class="amount-chip active" type="button" data-amount-type="medium">中</button>
-                  <button id="amountLargeBtn" class="amount-chip" type="button" data-amount-type="large">多</button>
+              <div class="two-col">
+                <div class="form-group">
+                  <label for="freezerCountInput">個数</label>
+                  <input id="freezerCountInput" type="number" min="1" step="1" placeholder="10" value="1" />
                 </div>
-              </div>
-
-              <div class="form-group">
-                <label for="freezerAmountTextInput">量の自由入力（任意）</label>
-                <input id="freezerAmountTextInput" type="text" placeholder="例：2食分、3個、半分" />
+                <div class="form-group">
+                  <label for="freezerUnitInput">単位</label>
+                  <input id="freezerUnitInput" type="text" placeholder="個" value="個" />
+                </div>
               </div>
 
               <div class="inline-actions">
@@ -725,7 +754,7 @@
           <section class="panel">
             <div class="freezer-row">
               <h2 class="section-title" style="margin-bottom:0;">現在入っているもの</h2>
-              <div class="section-note">タップで編集、削除可能</div>
+              <div class="section-note">−1 / +1 で在庫を調整</div>
             </div>
             <section id="freezerList" class="list"></section>
           </section>
@@ -763,8 +792,8 @@
         <span>年代ごとの目標や将来やりたいことを登録します。</span>
       </button>
       <button id="openFreezerFormBtn" class="action-choice" type="button">
-        <strong>冷凍庫メモを追加</strong>
-        <span>食材名と大雑把な量を登録します。</span>
+        <strong>冷凍庫ストックを追加</strong>
+        <span>食材名と個数を登録します。</span>
       </button>
       <div class="modal-actions">
         <button id="closeFabModalBtn" class="secondary-btn" type="button">閉じる</button>
@@ -806,7 +835,6 @@
       editingPlaceId: null,
       editingPlanId: null,
       editingFreezerId: null,
-      freezerAmountType: "medium",
       deleteTarget: null,
       pendingEmail: ""
     };
@@ -868,14 +896,12 @@
 
       freezerFormTitle: $("freezerFormTitle"),
       freezerNameInput: $("freezerNameInput"),
-      freezerAmountTextInput: $("freezerAmountTextInput"),
+      freezerCountInput: $("freezerCountInput"),
+      freezerUnitInput: $("freezerUnitInput"),
       saveFreezerBtn: $("saveFreezerBtn"),
       cancelFreezerEditBtn: $("cancelFreezerEditBtn"),
       freezerStatus: $("freezerStatus"),
       freezerList: $("freezerList"),
-      amountSmallBtn: $("amountSmallBtn"),
-      amountMediumBtn: $("amountMediumBtn"),
-      amountLargeBtn: $("amountLargeBtn"),
 
       fabModal: $("fabModal"),
       openPlaceFormBtn: $("openPlaceFormBtn"),
@@ -938,27 +964,10 @@
       return String(value ?? "");
     }
 
-    function freezerAmountLabel(value) {
-      if (value === "small") return "小";
-      if (value === "medium") return "中";
-      if (value === "large") return "多";
-      return "中";
-    }
-
     function freezerDisplayAmount(item) {
-      const text = String(item.amount_text || "").trim();
-      return text || freezerAmountLabel(item.amount_type);
-    }
-
-    function updateFreezerAmountButtons() {
-      document.querySelectorAll("[data-amount-type]").forEach((btn) => {
-        btn.classList.toggle("active", btn.dataset.amountType === state.freezerAmountType);
-      });
-    }
-
-    function setFreezerAmountType(type) {
-      state.freezerAmountType = type;
-      updateFreezerAmountButtons();
+      const count = Number(item.count ?? 0);
+      const unit = String(item.unit || "個").trim() || "個";
+      return `${count}${unit}`;
     }
 
     function showLoggedOut() {
@@ -1032,7 +1041,7 @@
       els.savePlanBtn.textContent = planEditing ? "更新する" : "追加する";
       els.cancelPlanEditBtn.classList.toggle("hidden", !planEditing);
 
-      els.freezerFormTitle.textContent = freezerEditing ? "冷凍庫メモを編集" : "冷凍庫メモを追加";
+      els.freezerFormTitle.textContent = freezerEditing ? "冷凍庫ストックを編集" : "冷凍庫ストックを追加";
       els.saveFreezerBtn.textContent = freezerEditing ? "更新する" : "追加する";
       els.cancelFreezerEditBtn.classList.toggle("hidden", !freezerEditing);
     }
@@ -1060,8 +1069,8 @@
     function resetFreezerForm() {
       state.editingFreezerId = null;
       els.freezerNameInput.value = "";
-      els.freezerAmountTextInput.value = "";
-      setFreezerAmountType("medium");
+      els.freezerCountInput.value = "1";
+      els.freezerUnitInput.value = "個";
       updateFormTitles();
     }
 
@@ -1144,12 +1153,12 @@
     }
 
     function renderFreezer() {
-      updateFreezerAmountButtons();
       const rows = state.freezerItems;
       if (rows.length === 0) {
-        els.freezerList.innerHTML = `<div class="empty-state">冷凍庫メモはまだありません。</div>`;
+        els.freezerList.innerHTML = `<div class="empty-state">冷凍庫ストックはまだありません。</div>`;
         return;
       }
+
       els.freezerList.innerHTML = rows.map((item) => `
         <article class="card">
           <div class="pill-row">
@@ -1157,9 +1166,16 @@
             <span class="pill">${escapeHtml(freezerDisplayAmount(item))}</span>
           </div>
           <h3 class="card-title">${escapeHtml(item.name)}</h3>
-          <div class="card-actions">
-            <button class="secondary-btn" type="button" data-freezer-edit="${escapeHtml(item.id)}">編集</button>
-            <button class="danger-btn" type="button" data-freezer-delete="${escapeHtml(item.id)}">削除</button>
+          <div class="freezer-card-bottom">
+            <div class="counter-row">
+              <button class="count-btn" type="button" data-freezer-decrement="${escapeHtml(item.id)}">−</button>
+              <div class="count-display">${escapeHtml(freezerDisplayAmount(item))}</div>
+              <button class="count-btn" type="button" data-freezer-increment="${escapeHtml(item.id)}">＋</button>
+            </div>
+            <div class="card-actions" style="margin:0;">
+              <button class="mini-btn" type="button" data-freezer-edit="${escapeHtml(item.id)}">編集</button>
+              <button class="danger-btn mini-btn" type="button" data-freezer-delete="${escapeHtml(item.id)}">削除</button>
+            </div>
           </div>
         </article>
       `).join("");
@@ -1197,7 +1213,7 @@
     async function loadFreezerItems() {
       const { data, error } = await supabase
         .from("freezer_items")
-        .select("id, name, amount_type, amount_text, created_at")
+        .select("id, name, count, unit, created_at")
         .eq("list_id", SHARED_LIST_ID)
         .order("created_at", { ascending: false });
 
@@ -1407,8 +1423,8 @@
 
     async function saveFreezerItem() {
       const name = els.freezerNameInput.value.trim();
-      const amount_type = state.freezerAmountType || "medium";
-      const amount_text = els.freezerAmountTextInput.value.trim();
+      const count = Number(els.freezerCountInput.value);
+      const unit = (els.freezerUnitInput.value.trim() || "個");
 
       if (!state.user) {
         setStatus(els.freezerStatus, "先にログインしてください。", "error");
@@ -1418,12 +1434,16 @@
         setStatus(els.freezerStatus, "食材名を入力してください。", "error");
         return;
       }
+      if (!Number.isInteger(count) || count < 1) {
+        setStatus(els.freezerStatus, "個数は1以上の整数で入力してください。", "error");
+        return;
+      }
 
       const payload = {
         list_id: SHARED_LIST_ID,
         name,
-        amount_type,
-        amount_text,
+        count,
+        unit,
         created_by: state.user.id
       };
 
@@ -1490,8 +1510,8 @@
       if (!item) return;
       state.editingFreezerId = id;
       els.freezerNameInput.value = item.name || "";
-      els.freezerAmountTextInput.value = item.amount_text || "";
-      setFreezerAmountType(item.amount_type || "medium");
+      els.freezerCountInput.value = String(item.count ?? 1);
+      els.freezerUnitInput.value = item.unit || "個";
       updateFormTitles();
       switchScreen("freezer");
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1513,6 +1533,44 @@
       setStatus(els.placeStatus, "更新しました。", "success");
     }
 
+    async function changeFreezerCount(id, delta) {
+      const item = state.freezerItems.find((row) => row.id === id);
+      if (!item) return;
+
+      const currentCount = Number(item.count ?? 0);
+      const nextCount = currentCount + delta;
+
+      if (nextCount <= 0) {
+        setStatus(els.freezerStatus, "0以下になるため項目を削除しました。", "warning");
+        const { error } = await supabase
+          .from("freezer_items")
+          .delete()
+          .eq("id", id)
+          .eq("list_id", SHARED_LIST_ID);
+        if (error) {
+          setStatus(els.freezerStatus, `更新に失敗しました: ${error.message}`, "error");
+          return;
+        }
+        if (state.editingFreezerId === id) resetFreezerForm();
+        await reloadAllData();
+        return;
+      }
+
+      const { error } = await supabase
+        .from("freezer_items")
+        .update({ count: nextCount })
+        .eq("id", id)
+        .eq("list_id", SHARED_LIST_ID);
+
+      if (error) {
+        setStatus(els.freezerStatus, `更新に失敗しました: ${error.message}`, "error");
+        return;
+      }
+
+      await reloadAllData();
+      setStatus(els.freezerStatus, `在庫を${delta > 0 ? "増やし" : "減らし"}ました。`, "success");
+    }
+
     function openDeleteModal(target) {
       state.deleteTarget = target;
       if (target.kind === "place") {
@@ -1520,7 +1578,7 @@
       } else if (target.kind === "plan") {
         els.deleteModalText.textContent = "このライフプランを削除しますか？";
       } else {
-        els.deleteModalText.textContent = "この冷凍庫メモを削除しますか？";
+        els.deleteModalText.textContent = "この冷凍庫ストックを削除しますか？";
       }
       els.deleteModal.classList.remove("hidden");
     }
@@ -1594,10 +1652,6 @@
 
       document.querySelectorAll(".nav-btn").forEach((btn) => {
         btn.addEventListener("click", () => switchScreen(btn.dataset.screen));
-      });
-
-      document.querySelectorAll("[data-amount-type]").forEach((btn) => {
-        btn.addEventListener("click", () => setFreezerAmountType(btn.dataset.amountType));
       });
 
       els.fab.addEventListener("click", openFabModal);
@@ -1685,13 +1739,17 @@
         if (deleteId) openDeleteModal({ kind: "plan", id: deleteId });
       });
 
-      els.freezerList.addEventListener("click", (e) => {
+      els.freezerList.addEventListener("click", async (e) => {
         const target = e.target;
         if (!(target instanceof HTMLElement)) return;
         const editId = target.dataset.freezerEdit;
         const deleteId = target.dataset.freezerDelete;
+        const incrementId = target.dataset.freezerIncrement;
+        const decrementId = target.dataset.freezerDecrement;
         if (editId) startFreezerEdit(editId);
         if (deleteId) openDeleteModal({ kind: "freezer", id: deleteId });
+        if (incrementId) await changeFreezerCount(incrementId, 1);
+        if (decrementId) await changeFreezerCount(decrementId, -1);
       });
 
       els.confirmDeleteBtn.addEventListener("click", confirmDelete);
