@@ -765,13 +765,12 @@
                   ><input
                     id="planTitleInput"
                     type="text"
-                    placeholder="例：30代でヨーロッパ旅行"
+                    placeholder="例：ヨーロッパ旅行"
                   />
                 </div>
                 <div class="form-group">
                   <label for="planAgeInput">年代</label
                   ><select id="planAgeInput">
-                    <option value="20代">20代</option>
                     <option value="30代">30代</option>
                     <option value="40代">40代</option>
                     <option value="50代">50代</option>
@@ -796,23 +795,6 @@
                     <option value="shared">共通</option>
                     <option value="male">彼氏</option>
                     <option value="female">彼女</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="planStatusInput">状態</label
-                  ><select id="planStatusInput">
-                    <option value="idea">いつか</option>
-                    <option value="planning">検討中</option>
-                    <option value="active">進行中</option>
-                    <option value="done">達成</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="planPriorityInput">優先度</label
-                  ><select id="planPriorityInput">
-                    <option value="3">高</option>
-                    <option value="2" selected>中</option>
-                    <option value="1">低</option>
                   </select>
                 </div>
                 <div class="form-group">
@@ -847,9 +829,7 @@
                   data-age-filter="all"
                   type="button"
                 >
-                  すべて</button
-                ><button class="tab-btn" data-age-filter="20代" type="button">
-                  20代</button
+                  すべて</button>
                 ><button class="tab-btn" data-age-filter="30代" type="button">
                   30代</button
                 ><button class="tab-btn" data-age-filter="40代" type="button">
@@ -1232,8 +1212,6 @@
         planAgeInput: $("planAgeInput"),
         planCategoryInput: $("planCategoryInput"),
         planOwnerInput: $("planOwnerInput"),
-        planStatusInput: $("planStatusInput"),
-        planPriorityInput: $("planPriorityInput"),
         planNoteInput: $("planNoteInput"),
         savePlanBtn: $("savePlanBtn"),
         cancelPlanEditBtn: $("cancelPlanEditBtn"),
@@ -1320,25 +1298,8 @@
               ? "彼女"
               : v || "不明";
       }
-      function statusLabel(v) {
-        return v === "idea"
-          ? "いつか"
-          : v === "planning"
-            ? "検討中"
-            : v === "active"
-              ? "進行中"
-              : v === "done"
-                ? "達成"
-                : v || "不明";
-      }
-      function priorityLabel(v) {
-        return Number(v) === 3
-          ? "高"
-          : Number(v) === 2
-            ? "中"
-            : Number(v) === 1
-              ? "低"
-              : String(v ?? "");
+      function planDoneLabel(v) {
+        return v === "done" ? "実施済み" : "未実施";
       }
       function freezerDisplayAmount(item) {
         return `${Number(item.count ?? 0)}${String(item.unit || "個").trim() || "個"}`;
@@ -1532,11 +1493,9 @@
       function resetPlanForm() {
         state.editingPlanId = null;
         els.planTitleInput.value = "";
-        els.planAgeInput.value = "20代";
+        els.planAgeInput.value = "30代";
         els.planCategoryInput.value = "旅行";
         els.planOwnerInput.value = "shared";
-        els.planStatusInput.value = "idea";
-        els.planPriorityInput.value = "2";
         els.planNoteInput.value = "";
         updateFormTitles();
       }
@@ -1596,7 +1555,7 @@
           ? rows
               .map(
                 (i) =>
-                  `<article class="card"><div class="pill-row"><span class="pill">${escapeHtml(i.age_group || "")}</span><span class="pill">${escapeHtml(i.category || "")}</span><span class="pill">${escapeHtml(ownerLabel(i.owner_type))}</span><span class="pill primary">${escapeHtml(statusLabel(i.status))}</span><span class="pill">優先度 ${escapeHtml(priorityLabel(i.priority))}</span></div><h3 class="card-title">${escapeHtml(i.title)}</h3><p class="card-text">${escapeHtml(i.note || "メモなし")}</p><div class="card-actions"><button class="secondary-btn" type="button" data-plan-edit="${escapeHtml(i.id)}">編集</button><button class="danger-btn" type="button" data-plan-delete="${escapeHtml(i.id)}">削除</button></div></article>`,
+                  `<article class="card"><div class="pill-row"><span class="pill">${escapeHtml(i.age_group || "")}</span><span class="pill">${escapeHtml(i.category || "")}</span><span class="pill">${escapeHtml(ownerLabel(i.owner_type))}</span><span class="pill primary">${escapeHtml(planDoneLabel(i.status))}</span></div><h3 class="card-title">${escapeHtml(i.title)}</h3><p class="card-text">${escapeHtml(i.note || "メモなし")}</p><div class="card-actions"><button class="secondary-btn" type="button" data-plan-toggle="${escapeHtml(i.id)}" data-next-status="${i.status === "done" ? "idea" : "done"}">${i.status === "done" ? "未実施に戻す" : "実施済みにする"}</button><button class="secondary-btn" type="button" data-plan-edit="${escapeHtml(i.id)}">編集</button><button class="danger-btn" type="button" data-plan-delete="${escapeHtml(i.id)}">削除</button></div></article>`,
               )
               .join("")
           : `<div class="empty-state">該当するライフプランがありません。</div>`;
@@ -1912,8 +1871,9 @@
           age_group = els.planAgeInput.value,
           category = els.planCategoryInput.value,
           owner_type = els.planOwnerInput.value,
-          status = els.planStatusInput.value,
-          priority = Number(els.planPriorityInput.value),
+          existingPlan = state.editingPlanId ? state.plans.find((r) => r.id === state.editingPlanId) : null,
+          status = existingPlan?.status || "idea",
+          priority = existingPlan?.priority ?? 2,
           note = els.planNoteInput.value.trim();
         if (!state.user)
           return setStatus(
@@ -2262,11 +2222,9 @@
         if (!i) return;
         state.editingPlanId = id;
         els.planTitleInput.value = i.title || "";
-        els.planAgeInput.value = i.age_group || "20代";
+        els.planAgeInput.value = i.age_group || "30代";
         els.planCategoryInput.value = i.category || "旅行";
         els.planOwnerInput.value = i.owner_type || "shared";
-        els.planStatusInput.value = i.status || "idea";
-        els.planPriorityInput.value = String(i.priority ?? 2);
         els.planNoteInput.value = i.note || "";
         updateFormTitles();
         switchScreen("plans");
@@ -2311,6 +2269,22 @@
           );
         await reloadAllData();
         setStatus(els.placeStatus, "更新しました。", "success");
+      }
+      async function togglePlanDone(id, nextStatus) {
+        setStatus(els.planStatus, "更新中...");
+        const { error } = await supabase
+          .from("life_plans")
+          .update({ status: nextStatus })
+          .eq("id", id)
+          .eq("list_id", SHARED_LIST_ID);
+        if (error)
+          return setStatus(
+            els.planStatus,
+            `更新に失敗しました: ${error.message}`,
+            "error",
+          );
+        await reloadAllData();
+        setStatus(els.planStatus, "更新しました。", "success");
       }
       async function changeFreezerCount(id, delta) {
         const i = state.freezerItems.find((r) => r.id === id);
@@ -2591,7 +2565,7 @@
           if (t.dataset.placeDelete)
             openDeleteModal({ kind: "place", id: t.dataset.placeDelete });
         });
-        els.plansList.addEventListener("click", (e) => {
+        els.plansList.addEventListener("click", async (e) => {
           const t = e.target;
           if (!(t instanceof HTMLElement)) return;
           if (t.dataset.planEdit) startPlanEdit(t.dataset.planEdit);
