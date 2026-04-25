@@ -25,7 +25,8 @@
       }
       body {
         margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
           "Hiragino Sans", "Noto Sans JP", sans-serif;
         background: var(--bg);
         color: var(--text);
@@ -337,7 +338,7 @@
         transform: translateX(-50%);
         width: min(760px, 100%);
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(5, 1fr);
         background: rgba(255, 255, 255, 0.96);
         backdrop-filter: blur(10px);
         border-top: 1px solid var(--line);
@@ -469,6 +470,82 @@
       .mini-btn {
         padding: 10px 12px;
         font-size: 13px;
+      }
+      .settlement-summary {
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: #fafafa;
+        margin-bottom: 16px;
+      }
+      .settlement-label {
+        font-size: 13px;
+        color: var(--muted);
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      .settlement-direction {
+        font-size: 20px;
+        font-weight: 800;
+        margin-bottom: 6px;
+      }
+      .settlement-amount {
+        font-size: 34px;
+        font-weight: 900;
+        line-height: 1.1;
+        margin-bottom: 8px;
+      }
+      .settlement-meta {
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+      .settlement-total {
+        font-size: 14px;
+        color: var(--text);
+        font-weight: 800;
+        margin-top: 4px;
+      }
+      .settlement-actions {
+        display: grid;
+        gap: 10px;
+      }
+      .settlement-filters {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      .settlement-filters button {
+        flex: 1;
+      }
+      .payment-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .payment-date {
+        font-size: 13px;
+        color: var(--muted);
+        margin-bottom: 4px;
+      }
+      .payment-amount {
+        font-size: 22px;
+        font-weight: 900;
+        white-space: nowrap;
+      }
+      .payment-meta {
+        font-size: 14px;
+        color: var(--muted);
+        margin: 0 0 12px;
+      }
+      .status-pill-settled {
+        background: #dcfce7;
+        color: #166534;
+      }
+      .status-pill-unpaid {
+        background: var(--primary-soft);
+        color: #3730a3;
       }
       .deadline-soon {
         color: var(--warning);
@@ -917,6 +994,66 @@
               <section id="snacksList" class="list"></section>
             </section>
           </section>
+          <section id="screen-settlements" class="screen">
+            <section class="panel">
+              <h2 class="section-title">精算メモ</h2>
+              <div class="settlement-summary">
+                <div class="settlement-label">現在の精算額</div>
+                <div
+                  class="settlement-direction"
+                  id="settlementSummaryDirection"
+                >
+                  精算なし
+                </div>
+                <div class="settlement-amount" id="settlementSummaryAmount">
+                  ¥0
+                </div>
+                <div class="settlement-meta" id="settlementSummaryCount">
+                  未払い 0件
+                </div>
+                <div class="settlement-total" id="settlementSummaryTotal">
+                  未払い合計 ¥0
+                </div>
+              </div>
+              <div class="settlement-actions">
+                <button id="addSettlementBtn" class="primary-btn" type="button">
+                  ＋ 支払いを追加</button
+                ><button
+                  id="settleAllSettlementBtn"
+                  class="secondary-btn"
+                  type="button"
+                >
+                  未払いを全件精算済みにする</button
+                ><button
+                  id="deleteSettledSettlementBtn"
+                  class="danger-btn"
+                  type="button"
+                >
+                  精算済みを一括削除
+                </button>
+              </div>
+              <div id="settlementStatus" class="status"></div>
+            </section>
+            <section class="panel">
+              <h2 class="section-title" id="settlementListTitle">未払い一覧</h2>
+              <div class="settlement-filters">
+                <button
+                  class="tab-btn active"
+                  id="settlementShowUnpaidBtn"
+                  type="button"
+                >
+                  未払いだけ表示</button
+                ><button
+                  class="tab-btn"
+                  id="settlementShowAllBtn"
+                  type="button"
+                >
+                  精算済みも見る
+                </button>
+              </div>
+              <section id="settlementsList" class="list"></section>
+            </section>
+          </section>
         </section>
       </main>
       <button id="fab" class="fab hidden" type="button">＋</button>
@@ -928,7 +1065,9 @@
         ><button class="nav-btn" data-screen="freezer" type="button">
           <span class="nav-icon">🧊</span><span>冷凍庫</span></button
         ><button class="nav-btn" data-screen="snacks" type="button">
-          <span class="nav-icon">🍪</span><span>お菓子</span>
+          <span class="nav-icon">🍪</span><span>お菓子</span></button
+        ><button class="nav-btn" data-screen="settlements" type="button">
+          <span class="nav-icon">💰</span><span>精算</span>
         </button>
       </nav>
     </div>
@@ -945,12 +1084,70 @@
           <strong>冷凍庫ストックを追加</strong
           ><span>食材名と個数を登録します。</span></button
         ><button id="openSnackFormBtn" class="action-choice" type="button">
-          <strong>お菓子を追加</strong><span>お菓子名と期限を登録します。</span>
+          <strong>お菓子を追加</strong
+          ><span>お菓子名と期限を登録します。</span></button
+        ><button id="openSettlementFormBtn" class="action-choice" type="button">
+          <strong>精算メモを追加</strong
+          ><span>支払い内容・金額・支払った人を登録します。</span>
         </button>
         <div class="modal-actions">
           <button id="closeFabModalBtn" class="secondary-btn" type="button">
             閉じる
           </button>
+        </div>
+      </div>
+    </div>
+    <div id="settlementModal" class="modal-backdrop hidden">
+      <div class="modal-card">
+        <h3 class="modal-title" id="settlementModalTitle">支払いを追加</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="settlementDateInput">日付</label
+            ><input id="settlementDateInput" type="date" />
+          </div>
+          <div class="form-group">
+            <label for="settlementTitleInput">内容</label
+            ><input
+              id="settlementTitleInput"
+              type="text"
+              placeholder="例：ランチ"
+            />
+          </div>
+          <div class="form-group">
+            <label for="settlementAmountInput">金額</label
+            ><input
+              id="settlementAmountInput"
+              type="number"
+              min="1"
+              step="1"
+              placeholder="例：2000"
+            />
+          </div>
+          <div class="form-group">
+            <label for="settlementPaidByInput">支払った人</label
+            ><select id="settlementPaidByInput">
+              <option value="boyfriend">彼氏</option>
+              <option value="girlfriend">彼女</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="settlementPaymentStatusInput">状態</label
+            ><select id="settlementPaymentStatusInput">
+              <option value="unpaid">未払い</option>
+              <option value="settled">精算済み</option>
+            </select>
+          </div>
+          <div class="modal-actions" style="padding: 0; border-top: none">
+            <button id="saveSettlementBtn" class="primary-btn" type="button">
+              保存</button
+            ><button
+              id="cancelSettlementBtn"
+              class="secondary-btn"
+              type="button"
+            >
+              キャンセル
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -980,6 +1177,8 @@
         plans: [],
         freezerItems: [],
         snacks: [],
+        settlements: [],
+        settlementShowAll: false,
         placeVisitFilter: "want",
         placeCategoryFilter: "all",
         planAgeFilter: "all",
@@ -988,6 +1187,7 @@
         editingPlanId: null,
         editingFreezerId: null,
         editingSnackId: null,
+        editingSettlementId: null,
         deleteTarget: null,
         pendingEmail: "",
       };
@@ -1054,11 +1254,33 @@
         cancelSnackEditBtn: $("cancelSnackEditBtn"),
         snackStatus: $("snackStatus"),
         snacksList: $("snacksList"),
+        settlementSummaryDirection: $("settlementSummaryDirection"),
+        settlementSummaryAmount: $("settlementSummaryAmount"),
+        settlementSummaryCount: $("settlementSummaryCount"),
+        settlementSummaryTotal: $("settlementSummaryTotal"),
+        settlementStatus: $("settlementStatus"),
+        settlementListTitle: $("settlementListTitle"),
+        settlementsList: $("settlementsList"),
+        settlementShowUnpaidBtn: $("settlementShowUnpaidBtn"),
+        settlementShowAllBtn: $("settlementShowAllBtn"),
+        addSettlementBtn: $("addSettlementBtn"),
+        settleAllSettlementBtn: $("settleAllSettlementBtn"),
+        deleteSettledSettlementBtn: $("deleteSettledSettlementBtn"),
+        settlementModal: $("settlementModal"),
+        settlementModalTitle: $("settlementModalTitle"),
+        settlementDateInput: $("settlementDateInput"),
+        settlementTitleInput: $("settlementTitleInput"),
+        settlementAmountInput: $("settlementAmountInput"),
+        settlementPaidByInput: $("settlementPaidByInput"),
+        settlementPaymentStatusInput: $("settlementPaymentStatusInput"),
+        saveSettlementBtn: $("saveSettlementBtn"),
+        cancelSettlementBtn: $("cancelSettlementBtn"),
         fabModal: $("fabModal"),
         openPlaceFormBtn: $("openPlaceFormBtn"),
         openPlanFormBtn: $("openPlanFormBtn"),
         openFreezerFormBtn: $("openFreezerFormBtn"),
         openSnackFormBtn: $("openSnackFormBtn"),
+        openSettlementFormBtn: $("openSettlementFormBtn"),
         closeFabModalBtn: $("closeFabModalBtn"),
         deleteModal: $("deleteModal"),
         deleteModalText: $("deleteModalText"),
@@ -1070,6 +1292,7 @@
         plans: $("screen-plans"),
         freezer: $("screen-freezer"),
         snacks: $("screen-snacks"),
+        settlements: $("screen-settlements"),
       };
       function setStatus(el, msg = "", type = "") {
         el.textContent = msg;
@@ -1158,16 +1381,62 @@
             b.classList.toggle("active", b.dataset.screen === screen),
           );
       }
+      function formatCurrency(v) {
+        return `¥${Number(v || 0).toLocaleString("ja-JP")}`;
+      }
+      function payerLabel(v) {
+        return v === "boyfriend" ? "彼氏" : "彼女";
+      }
+      function paymentStatusLabel(v) {
+        return v === "settled" ? "精算済み" : "未払い";
+      }
+      function todayDateString() {
+        const d = new Date(),
+          y = d.getFullYear(),
+          m = String(d.getMonth() + 1).padStart(2, "0"),
+          day = String(d.getDate()).padStart(2, "0");
+        return `${y}-${m}-${day}`;
+      }
+      function calculateSettlement() {
+        const unpaid = state.settlements.filter((i) => i.status === "unpaid");
+        const total = unpaid.reduce((sum, i) => sum + Number(i.amount || 0), 0);
+        const boyfriendPaid = unpaid
+          .filter((i) => i.paid_by === "boyfriend")
+          .reduce((sum, i) => sum + Number(i.amount || 0), 0);
+        const girlfriendPaid = unpaid
+          .filter((i) => i.paid_by === "girlfriend")
+          .reduce((sum, i) => sum + Number(i.amount || 0), 0);
+        const half = total / 2;
+        const boyfriendBalance = boyfriendPaid - half;
+        const girlfriendBalance = girlfriendPaid - half;
+        let direction = "精算なし",
+          amount = 0;
+        if (boyfriendBalance > 0) {
+          direction = "彼女 → 彼氏";
+          amount = boyfriendBalance;
+        } else if (girlfriendBalance > 0) {
+          direction = "彼氏 → 彼女";
+          amount = girlfriendBalance;
+        }
+        return {
+          unpaidCount: unpaid.length,
+          total,
+          direction,
+          amount: Math.round(amount),
+        };
+      }
       function showLoggedOut() {
         state.user = null;
         state.places = [];
         state.plans = [];
         state.freezerItems = [];
         state.snacks = [];
+        state.settlements = [];
         state.editingPlaceId = null;
         state.editingPlanId = null;
         state.editingFreezerId = null;
         state.editingSnackId = null;
+        state.editingSettlementId = null;
         els.authPanel.classList.remove("hidden");
         els.appPanel.classList.add("hidden");
         els.bottomNav.classList.add("hidden");
@@ -1280,6 +1549,7 @@
       }
       function resetSnackForm() {
         state.editingSnackId = null;
+        state.editingSettlementId = null;
         els.snackNameInput.value = "";
         els.snackExpiresInput.value = "";
         updateFormTitles();
@@ -1353,12 +1623,46 @@
               .join("")
           : `<div class="empty-state">お菓子はまだありません。</div>`;
       }
+      function renderSettlements() {
+        const result = calculateSettlement();
+        els.settlementSummaryDirection.textContent = result.direction;
+        els.settlementSummaryAmount.textContent = formatCurrency(result.amount);
+        els.settlementSummaryCount.textContent = `未払い ${result.unpaidCount}件`;
+        els.settlementSummaryTotal.textContent = `未払い合計 ${formatCurrency(result.total)}`;
+        els.settlementShowUnpaidBtn.classList.toggle(
+          "active",
+          !state.settlementShowAll,
+        );
+        els.settlementShowAllBtn.classList.toggle(
+          "active",
+          state.settlementShowAll,
+        );
+        els.settlementListTitle.textContent = state.settlementShowAll
+          ? "支払い一覧"
+          : "未払い一覧";
+        const rows = [...state.settlements]
+          .filter((i) => state.settlementShowAll || i.status === "unpaid")
+          .sort((a, b) =>
+            String(b.payment_date).localeCompare(String(a.payment_date)),
+          );
+        if (!rows.length) {
+          els.settlementsList.innerHTML = `<div class="empty-state">${state.settlementShowAll ? "表示する支払いがありません" : "未払いはありません"}</div>`;
+          return;
+        }
+        els.settlementsList.innerHTML = rows
+          .map(
+            (i) =>
+              `<article class="card"><div class="payment-top"><div><div class="payment-date">${escapeHtml(formatDateJa(i.payment_date))}</div><h3 class="card-title">${escapeHtml(i.title)}</h3></div><div class="payment-amount">${escapeHtml(formatCurrency(i.amount))}</div></div><div class="pill-row"><span class="pill ${i.status === "settled" ? "status-pill-settled" : "status-pill-unpaid"}">${escapeHtml(paymentStatusLabel(i.status))}</span><span class="pill">支払った人: ${escapeHtml(payerLabel(i.paid_by))}</span></div><div class="card-actions">${i.status === "unpaid" ? `<button class="secondary-btn" type="button" data-settlement-settle="${escapeHtml(i.id)}">精算済みにする</button>` : ""}<button class="secondary-btn" type="button" data-settlement-edit="${escapeHtml(i.id)}">編集</button><button class="danger-btn" type="button" data-settlement-delete="${escapeHtml(i.id)}">削除</button></div></article>`,
+          )
+          .join("");
+      }
       function renderAll() {
         updateFormTitles();
         renderPlaces();
         renderPlans();
         renderFreezer();
         renderSnacks();
+        renderSettlements();
       }
       async function loadPlaces() {
         const { data, error } = await supabase
@@ -1399,6 +1703,16 @@
         if (error) throw error;
         state.snacks = Array.isArray(data) ? data : [];
       }
+      async function loadSettlements() {
+        const { data, error } = await supabase
+          .from("settlement_items")
+          .select("id,payment_date,title,amount,paid_by,status,created_at")
+          .eq("list_id", SHARED_LIST_ID)
+          .order("payment_date", { ascending: false })
+          .order("created_at", { ascending: false });
+        if (error) throw error;
+        state.settlements = Array.isArray(data) ? data : [];
+      }
       async function verifyMembership(user) {
         const { data, error } = await supabase
           .from("list_members")
@@ -1420,6 +1734,7 @@
             loadPlans(),
             loadFreezerItems(),
             loadSnacks(),
+            loadSettlements(),
           ]);
           renderAll();
           if (statusEl) setStatus(statusEl, "再読み込みしました。", "success");
@@ -1773,6 +2088,163 @@
           "success",
         );
       }
+      async function saveSettlement() {
+        const payment_date = els.settlementDateInput.value,
+          title = els.settlementTitleInput.value.trim(),
+          amount = Number(els.settlementAmountInput.value),
+          paid_by = els.settlementPaidByInput.value,
+          status = els.settlementPaymentStatusInput.value;
+        if (!state.user)
+          return setStatus(
+            els.settlementStatus,
+            "先にログインしてください。",
+            "error",
+          );
+        if (!payment_date)
+          return setStatus(
+            els.settlementStatus,
+            "日付を入力してください。",
+            "error",
+          );
+        if (!title)
+          return setStatus(
+            els.settlementStatus,
+            "内容を入力してください。",
+            "error",
+          );
+        if (!Number.isFinite(amount) || amount <= 0)
+          return setStatus(
+            els.settlementStatus,
+            "金額を正しく入力してください。",
+            "error",
+          );
+        const payload = {
+          list_id: SHARED_LIST_ID,
+          payment_date,
+          title,
+          amount: Math.round(amount),
+          paid_by,
+          status,
+          created_by: state.user.id,
+        };
+        els.saveSettlementBtn.disabled = true;
+        setStatus(
+          els.settlementStatus,
+          state.editingSettlementId ? "更新中..." : "保存中...",
+        );
+        let error = null;
+        if (state.editingSettlementId) {
+          const up = { ...payload };
+          delete up.created_by;
+          ({ error } = await supabase
+            .from("settlement_items")
+            .update(up)
+            .eq("id", state.editingSettlementId)
+            .eq("list_id", SHARED_LIST_ID));
+        } else
+          ({ error } = await supabase.from("settlement_items").insert(payload));
+        els.saveSettlementBtn.disabled = false;
+        if (error)
+          return setStatus(
+            els.settlementStatus,
+            `保存に失敗しました: ${error.message}`,
+            "error",
+          );
+        const was = !!state.editingSettlementId;
+        closeSettlementModal();
+        await reloadAllData();
+        setStatus(
+          els.settlementStatus,
+          was ? "更新しました。" : "保存しました。",
+          "success",
+        );
+      }
+      function openSettlementModal(item = null) {
+        state.editingSettlementId = item ? item.id : null;
+        els.settlementDateInput.value = item?.payment_date || todayDateString();
+        els.settlementTitleInput.value = item?.title || "";
+        els.settlementAmountInput.value = item?.amount || "";
+        els.settlementPaidByInput.value = item?.paid_by || "boyfriend";
+        els.settlementPaymentStatusInput.value = item?.status || "unpaid";
+        updateFormTitles();
+        els.settlementModal.classList.remove("hidden");
+      }
+      function closeSettlementModal() {
+        els.settlementModal.classList.add("hidden");
+        resetSettlementForm();
+      }
+      function startSettlementEdit(id) {
+        const item = state.settlements.find((r) => r.id === id);
+        if (!item) return;
+        openSettlementModal(item);
+      }
+      async function settlePayment(id) {
+        const { error } = await supabase
+          .from("settlement_items")
+          .update({ status: "settled" })
+          .eq("id", id)
+          .eq("list_id", SHARED_LIST_ID);
+        if (error)
+          return setStatus(
+            els.settlementStatus,
+            `更新に失敗しました: ${error.message}`,
+            "error",
+          );
+        await reloadAllData();
+        setStatus(els.settlementStatus, "精算済みにしました。", "success");
+      }
+      async function settleAllPayments() {
+        const unpaid = state.settlements.filter((i) => i.status === "unpaid");
+        if (!unpaid.length)
+          return setStatus(
+            els.settlementStatus,
+            "未払いはありません。",
+            "warning",
+          );
+        const { error } = await supabase
+          .from("settlement_items")
+          .update({ status: "settled" })
+          .eq("list_id", SHARED_LIST_ID)
+          .eq("status", "unpaid");
+        if (error)
+          return setStatus(
+            els.settlementStatus,
+            `更新に失敗しました: ${error.message}`,
+            "error",
+          );
+        await reloadAllData();
+        setStatus(
+          els.settlementStatus,
+          "未払いを全件精算済みにしました。",
+          "success",
+        );
+      }
+      async function deleteSettledPayments() {
+        const settled = state.settlements.filter((i) => i.status === "settled");
+        if (!settled.length)
+          return setStatus(
+            els.settlementStatus,
+            "削除できる精算済みデータはありません。",
+            "warning",
+          );
+        const { error } = await supabase
+          .from("settlement_items")
+          .delete()
+          .eq("list_id", SHARED_LIST_ID)
+          .eq("status", "settled");
+        if (error)
+          return setStatus(
+            els.settlementStatus,
+            `削除に失敗しました: ${error.message}`,
+            "error",
+          );
+        await reloadAllData();
+        setStatus(
+          els.settlementStatus,
+          "精算済みを一括削除しました。",
+          "success",
+        );
+      }
       function startPlaceEdit(id) {
         const i = state.places.find((r) => r.id === id);
         if (!i) return;
@@ -1892,7 +2364,9 @@
               ? "このライフプランを削除しますか？"
               : target.kind === "freezer"
                 ? "この冷凍庫ストックを削除しますか？"
-                : "このお菓子を削除しますか？";
+                : target.kind === "snack"
+                  ? "このお菓子を削除しますか？"
+                  : "この精算メモを削除しますか？";
         els.deleteModal.classList.remove("hidden");
       }
       function closeDeleteModal() {
@@ -1909,7 +2383,9 @@
               ? "life_plans"
               : kind === "freezer"
                 ? "freezer_items"
-                : "snack_items";
+                : kind === "snack"
+                  ? "snack_items"
+                  : "settlement_items";
         const statusEl =
           kind === "place"
             ? els.placeStatus
@@ -1917,7 +2393,9 @@
               ? els.planStatus
               : kind === "freezer"
                 ? els.freezerStatus
-                : els.snackStatus;
+                : kind === "snack"
+                  ? els.snackStatus
+                  : els.settlementStatus;
         setStatus(statusEl, "削除中...");
         const { error } = await supabase
           .from(table)
@@ -1934,6 +2412,8 @@
         if (kind === "freezer" && state.editingFreezerId === id)
           resetFreezerForm();
         if (kind === "snack" && state.editingSnackId === id) resetSnackForm();
+        if (kind === "settlement" && state.editingSettlementId === id)
+          closeSettlementModal();
         await reloadAllData();
         setStatus(statusEl, "削除しました。", "success");
         closeDeleteModal();
@@ -1970,7 +2450,9 @@
                 ? els.freezerStatus
                 : state.currentScreen === "snacks"
                   ? els.snackStatus
-                  : els.placeStatus;
+                  : state.currentScreen === "settlements"
+                    ? els.settlementStatus
+                    : els.placeStatus;
           await reloadAllData(statusEl);
         });
         els.logoutBtn.addEventListener("click", async () => {
@@ -2019,6 +2501,11 @@
           scrollTo({ top: 0, behavior: "smooth" });
           els.snackNameInput.focus();
         });
+        els.openSettlementFormBtn.addEventListener("click", () => {
+          closeFabModal();
+          switchScreen("settlements");
+          openSettlementModal();
+        });
         els.savePlaceBtn.addEventListener("click", savePlace);
         els.cancelPlaceEditBtn.addEventListener("click", () => {
           resetPlaceForm();
@@ -2038,6 +2525,27 @@
         els.cancelSnackEditBtn.addEventListener("click", () => {
           resetSnackForm();
           setStatus(els.snackStatus, "編集をキャンセルしました。");
+        });
+        els.addSettlementBtn.addEventListener("click", () =>
+          openSettlementModal(),
+        );
+        els.saveSettlementBtn.addEventListener("click", saveSettlement);
+        els.cancelSettlementBtn.addEventListener("click", closeSettlementModal);
+        els.settlementModal.addEventListener("click", (e) => {
+          if (e.target === els.settlementModal) closeSettlementModal();
+        });
+        els.settleAllSettlementBtn.addEventListener("click", settleAllPayments);
+        els.deleteSettledSettlementBtn.addEventListener(
+          "click",
+          deleteSettledPayments,
+        );
+        els.settlementShowUnpaidBtn.addEventListener("click", () => {
+          state.settlementShowAll = false;
+          renderSettlements();
+        });
+        els.settlementShowAllBtn.addEventListener("click", () => {
+          state.settlementShowAll = true;
+          renderSettlements();
         });
         els.placeCategoryAllBtn.addEventListener("click", () => {
           state.placeCategoryFilter = "all";
@@ -2108,6 +2616,19 @@
           if (t.dataset.snackDelete)
             openDeleteModal({ kind: "snack", id: t.dataset.snackDelete });
         });
+        els.settlementsList.addEventListener("click", async (e) => {
+          const t = e.target;
+          if (!(t instanceof HTMLElement)) return;
+          if (t.dataset.settlementEdit)
+            startSettlementEdit(t.dataset.settlementEdit);
+          if (t.dataset.settlementDelete)
+            openDeleteModal({
+              kind: "settlement",
+              id: t.dataset.settlementDelete,
+            });
+          if (t.dataset.settlementSettle)
+            await settlePayment(t.dataset.settlementSettle);
+        });
         els.confirmDeleteBtn.addEventListener("click", confirmDelete);
         els.cancelDeleteBtn.addEventListener("click", closeDeleteModal);
         els.deleteModal.addEventListener("click", (e) => {
@@ -2125,6 +2646,7 @@
         resetPlanForm();
         resetFreezerForm();
         resetSnackForm();
+        resetSettlementForm();
         updatePlaceFilterTabs();
         updatePlanFilterTabs();
         renderAll();
