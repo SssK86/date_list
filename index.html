@@ -2565,13 +2565,22 @@
           if (t.dataset.placeDelete)
             openDeleteModal({ kind: "place", id: t.dataset.placeDelete });
         });
-        els.plansList.addEventListener("click", async (e) => {
-          const t = e.target;
-          if (!(t instanceof HTMLElement)) return;
-          if (t.dataset.planEdit) startPlanEdit(t.dataset.planEdit);
-          if (t.dataset.planDelete)
-            openDeleteModal({ kind: "plan", id: t.dataset.planDelete });
-        });
+els.plansList.addEventListener("click", async (e) => {
+  const t = e.target;
+  if (!(t instanceof HTMLElement)) return;
+
+  if (t.dataset.planToggle) {
+    await togglePlanDone(t.dataset.planToggle, t.dataset.nextStatus);
+  }
+
+  if (t.dataset.planEdit) {
+    startPlanEdit(t.dataset.planEdit);
+  }
+
+  if (t.dataset.planDelete) {
+    openDeleteModal({ kind: "plan", id: t.dataset.planDelete });
+  }
+});
         els.freezerList.addEventListener("click", async (e) => {
           const t = e.target;
           if (!(t instanceof HTMLElement)) return;
