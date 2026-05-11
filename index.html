@@ -471,6 +471,87 @@
         padding: 10px 12px;
         font-size: 13px;
       }
+
+      .view-toggle {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      .view-toggle button {
+        flex: 1;
+      }
+      .timeline-wrap {
+        display: grid;
+        gap: 18px;
+      }
+      .timeline-age {
+        border-left: 4px solid var(--primary);
+        padding-left: 14px;
+      }
+      .timeline-age-title {
+        margin: 0 0 10px;
+        font-size: 18px;
+        font-weight: 900;
+      }
+      .timeline-category {
+        margin: 12px 0 6px;
+        font-size: 15px;
+        font-weight: 900;
+        color: var(--text);
+      }
+      .timeline-items {
+        display: grid;
+        gap: 10px;
+      }
+      .timeline-item {
+        position: relative;
+        padding: 12px 12px 12px 18px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: #fff;
+      }
+      .timeline-item::before {
+        content: "";
+        position: absolute;
+        left: -24px;
+        top: 18px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--primary);
+        border: 3px solid #fff;
+        box-shadow: 0 0 0 1px var(--line);
+      }
+      .timeline-item-title {
+        margin: 0 0 6px;
+        font-size: 16px;
+        font-weight: 900;
+        line-height: 1.45;
+      }
+      .timeline-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 6px;
+      }
+      .timeline-note {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      .timeline-summary {
+        margin-bottom: 12px;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: #fafafa;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.6;
+      }
       .settlement-summary {
         padding: 18px;
         border: 1px solid var(--line);
@@ -863,6 +944,13 @@
                   彼女
                 </button>
               </div>
+              <div class="view-toggle">
+                <button class="tab-btn active" id="planListViewBtn" type="button">
+                  一覧表示</button
+                ><button class="tab-btn" id="planTimelineViewBtn" type="button">
+                  タイムライン表示
+                </button>
+              </div>
               <section id="plansList" class="list"></section>
             </section>
           </section>
@@ -1163,6 +1251,7 @@
         placeCategoryFilter: "all",
         planAgeFilter: "all",
         planOwnerFilter: "all",
+        planViewMode: "list",
         editingPlaceId: null,
         editingPlanId: null,
         editingFreezerId: null,
@@ -1216,6 +1305,8 @@
         savePlanBtn: $("savePlanBtn"),
         cancelPlanEditBtn: $("cancelPlanEditBtn"),
         planStatus: $("planStatus"),
+        planListViewBtn: $("planListViewBtn"),
+        planTimelineViewBtn: $("planTimelineViewBtn"),
         plansList: $("plansList"),
         freezerFormTitle: $("freezerFormTitle"),
         freezerNameInput: $("freezerNameInput"),
@@ -1554,15 +1645,83 @@
               .join("")
           : `<div class="empty-state">該当する行きたい場所がありません。</div>`;
       }
-      function renderPlans() {
-        updatePlanFilterTabs();
-        const rows = state.plans.filter(
+      function planCategoryIcon(category) {
+        const icons = {
+          旅行: "✈️",
+          暮らし: "🏠",
+          家族: "👪",
+          仕事: "💼",
+          お金: "💰",
+          健康: "🏥",
+          趣味: "🌴",
+        };
+        return icons[category] || "🗂";
+      }
+      function filteredPlans() {
+        return state.plans.filter(
           (i) =>
             (state.planAgeFilter === "all" ||
               i.age_group === state.planAgeFilter) &&
             (state.planOwnerFilter === "all" ||
               i.owner_type === state.planOwnerFilter),
         );
+      }
+      function updatePlanViewButtons() {
+        els.planListViewBtn.classList.toggle("active", state.planViewMode === "list");
+        els.planTimelineViewBtn.classList.toggle("active", state.planViewMode === "timeline");
+      }
+      function renderPlanTimeline(rows) {
+        if (!rows.length) {
+          return `<div class="empty-state">タイムラインに表示するライフプランがありません。</div>`;
+        }
+        const ageOrder = ["30代", "40代", "50代", "60代+"];
+        const categoryOrder = ["旅行", "暮らし", "家族", "仕事", "お金", "健康", "趣味"];
+        const completed = rows.filter((i) => i.status === "done").length;
+        const rate = rows.length ? Math.round((completed / rows.length) * 100) : 0;
+        const ages = [...new Set(rows.map((i) => i.age_group || "未設定"))].sort(
+          (a, b) => {
+            const ai = ageOrder.indexOf(a);
+            const bi = ageOrder.indexOf(b);
+            return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+          },
+        );
+        const body = ages
+          .map((age) => {
+            const ageRows = rows.filter((i) => (i.age_group || "未設定") === age);
+            const categories = [...new Set(ageRows.map((i) => i.category || "未設定"))].sort(
+              (a, b) => {
+                const ai = categoryOrder.indexOf(a);
+                const bi = categoryOrder.indexOf(b);
+                return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+              },
+            );
+            const categoryHtml = categories
+              .map((category) => {
+                const items = ageRows.filter((i) => (i.category || "未設定") === category);
+                const itemHtml = items
+                  .map(
+                    (i) =>
+                      `<div class="timeline-item"><h4 class="timeline-item-title">${escapeHtml(i.title)}</h4><div class="timeline-meta"><span class="pill primary">${escapeHtml(planDoneLabel(i.status))}</span><span class="pill">${escapeHtml(ownerLabel(i.owner_type))}</span></div><p class="timeline-note">${escapeHtml(i.note || "メモなし")}</p><div class="card-actions" style="margin-top:10px;"><button class="secondary-btn" type="button" data-plan-toggle="${escapeHtml(i.id)}" data-next-status="${i.status === "done" ? "idea" : "done"}">${i.status === "done" ? "未実施に戻す" : "実施済みにする"}</button><button class="secondary-btn" type="button" data-plan-edit="${escapeHtml(i.id)}">編集</button><button class="danger-btn" type="button" data-plan-delete="${escapeHtml(i.id)}">削除</button></div></div>`,
+                  )
+                  .join("");
+                return `<div class="timeline-category">${planCategoryIcon(category)} ${escapeHtml(category)}</div><div class="timeline-items">${itemHtml}</div>`;
+              })
+              .join("");
+            return `<section class="timeline-age"><h3 class="timeline-age-title">${escapeHtml(age)}</h3>${categoryHtml}</section>`;
+          })
+          .join("");
+        return `<div class="timeline-summary">達成率：${rate}% / 完了：${completed}件 / 全${rows.length}件</div><div class="timeline-wrap">${body}</div>`;
+      }
+      function renderPlans() {
+        updatePlanFilterTabs();
+        updatePlanViewButtons();
+        const rows = filteredPlans();
+        if (state.planViewMode === "timeline") {
+          els.plansList.className = "timeline-root";
+          els.plansList.innerHTML = renderPlanTimeline(rows);
+          return;
+        }
+        els.plansList.className = "list";
         els.plansList.innerHTML = rows.length
           ? rows
               .map(
@@ -2509,6 +2668,14 @@
         els.cancelPlanEditBtn.addEventListener("click", () => {
           resetPlanForm();
           setStatus(els.planStatus, "編集をキャンセルしました。");
+        });
+        els.planListViewBtn.addEventListener("click", () => {
+          state.planViewMode = "list";
+          renderPlans();
+        });
+        els.planTimelineViewBtn.addEventListener("click", () => {
+          state.planViewMode = "timeline";
+          renderPlans();
         });
         els.saveFreezerBtn.addEventListener("click", saveFreezerItem);
         els.cancelFreezerEditBtn.addEventListener("click", () => {
