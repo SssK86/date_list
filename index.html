@@ -872,7 +872,7 @@
                 冷凍庫ストックを追加
               </h2>
               <p class="section-note">
-                食材名・個数・単位を記録します。一覧の − / ＋
+                食材名・個数・単位を記録します。登録日・更新日は自動で記録します。一覧の − / ＋
                 で使った分だけ増減できます。
               </p>
               <div class="form-grid">
@@ -1309,6 +1309,18 @@
         const [y, m, d] = String(value).split("-");
         return y && m && d ? `${y}/${m}/${d}` : value;
       }
+      function formatDateTimeJa(value) {
+        if (!value) return "未記録";
+        const d = new Date(value);
+        if (Number.isNaN(d.getTime())) return "未記録";
+        return d.toLocaleString("ja-JP", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
       function daysUntil(value) {
         if (!value) return null;
         const today = new Date();
@@ -1566,7 +1578,7 @@
           ? rows
               .map(
                 (i) =>
-                  `<article class="card"><div class="pill-row"><span class="pill primary">冷凍庫</span><span class="pill">${escapeHtml(freezerDisplayAmount(i))}</span></div><h3 class="card-title">${escapeHtml(i.name)}</h3><div class="freezer-card-bottom"><div class="counter-row"><button class="count-btn" type="button" data-freezer-decrement="${escapeHtml(i.id)}">−</button><div class="count-display">${escapeHtml(freezerDisplayAmount(i))}</div><button class="count-btn" type="button" data-freezer-increment="${escapeHtml(i.id)}">＋</button></div><div class="card-actions" style="margin:0;"><button class="mini-btn" type="button" data-freezer-edit="${escapeHtml(i.id)}">編集</button><button class="danger-btn mini-btn" type="button" data-freezer-delete="${escapeHtml(i.id)}">削除</button></div></div></article>`,
+                  `<article class="card"><div class="pill-row"><span class="pill primary">冷凍庫</span><span class="pill">${escapeHtml(freezerDisplayAmount(i))}</span></div><h3 class="card-title">${escapeHtml(i.name)}</h3><p class="card-text">登録日：${escapeHtml(formatDateTimeJa(i.created_at))}<br>更新日：${escapeHtml(formatDateTimeJa(i.updated_at))}</p><div class="freezer-card-bottom"><div class="counter-row"><button class="count-btn" type="button" data-freezer-decrement="${escapeHtml(i.id)}">−</button><div class="count-display">${escapeHtml(freezerDisplayAmount(i))}</div><button class="count-btn" type="button" data-freezer-increment="${escapeHtml(i.id)}">＋</button></div><div class="card-actions" style="margin:0;"><button class="mini-btn" type="button" data-freezer-edit="${escapeHtml(i.id)}">編集</button><button class="danger-btn mini-btn" type="button" data-freezer-delete="${escapeHtml(i.id)}">削除</button></div></div></article>`,
               )
               .join("")
           : `<div class="empty-state">冷凍庫ストックはまだありません。</div>`;
@@ -1646,7 +1658,7 @@
       async function loadFreezerItems() {
         const { data, error } = await supabase
           .from("freezer_items")
-          .select("id,name,count,unit,created_at")
+          .select("id,name,count,unit,created_at,updated_at")
           .eq("list_id", SHARED_LIST_ID)
           .order("created_at", { ascending: false });
         if (error) throw error;
@@ -2118,6 +2130,14 @@
           was ? "更新しました。" : "保存しました。",
           "success",
         );
+      }
+      function resetSettlementForm() {
+        state.editingSettlementId = null;
+        els.settlementDateInput.value = todayDateString();
+        els.settlementTitleInput.value = "";
+        els.settlementAmountInput.value = "";
+        els.settlementPaidByInput.value = "boyfriend";
+        els.settlementPaymentStatusInput.value = "unpaid";
       }
       function openSettlementModal(item = null) {
         state.editingSettlementId = item ? item.id : null;
