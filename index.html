@@ -636,6 +636,48 @@
         color: var(--danger);
         font-weight: 800;
       }
+
+      .settlement-selection {
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: #fff;
+        margin-bottom: 16px;
+      }
+      .settlement-selection-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+      .settlement-selection-box {
+        padding: 12px;
+        border-radius: 14px;
+        background: #f9fafb;
+        border: 1px solid var(--line);
+      }
+      .settlement-selection-value {
+        margin-top: 4px;
+        font-size: 20px;
+        font-weight: 900;
+        line-height: 1.2;
+      }
+      .settlement-select-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .settlement-checkbox {
+        width: 22px;
+        height: 22px;
+        margin-top: 4px;
+        accent-color: var(--primary);
+        flex-shrink: 0;
+      }
+      .settlement-card-main {
+        flex: 1;
+        min-width: 0;
+      }
       @media (max-width: 560px) {
         h1 {
           font-size: 23px;
@@ -655,6 +697,9 @@
         .two-col {
           grid-template-columns: 1fr;
         }
+        .settlement-selection-grid {
+          grid-template-columns: 1fr;
+        }
         .freezer-card-bottom {
           align-items: stretch;
         }
@@ -668,7 +713,7 @@
           <div>
             <h1>ふたりの未来リスト</h1>
             <div class="subtitle">
-              行きたい場所・ライフプラン・冷凍庫・お菓子をまとめて管理
+              精算・冷凍庫・お菓子・行きたい場所・ライフプランをまとめて管理
             </div>
           </div>
           <div class="account-wrap">
@@ -729,7 +774,7 @@
           <div id="authStatus" class="status"></div>
         </section>
         <section id="appPanel" class="hidden">
-          <section id="screen-places" class="screen active">
+          <section id="screen-places" class="screen">
             <section class="panel">
               <h2 id="placeFormTitle" class="section-title">
                 行きたい場所を追加
@@ -1062,7 +1107,7 @@
               <section id="snacksList" class="list"></section>
             </section>
           </section>
-          <section id="screen-settlements" class="screen">
+          <section id="screen-settlements" class="screen active">
             <section class="panel">
               <h2 class="section-title">精算メモ</h2>
               <div class="settlement-summary">
@@ -1081,6 +1126,32 @@
                 </div>
                 <div class="settlement-total" id="settlementSummaryTotal">
                   未払い合計 ¥0
+                </div>
+              </div>
+              <div class="settlement-selection">
+                <div class="settlement-label">家計簿入力用の選択チェック</div>
+                <div class="settlement-selection-grid">
+                  <div class="settlement-selection-box">
+                    <div class="settlement-label">選択中</div>
+                    <div class="settlement-selection-value" id="selectedSettlementCount">0件</div>
+                  </div>
+                  <div class="settlement-selection-box">
+                    <div class="settlement-label">選択合計</div>
+                    <div class="settlement-selection-value" id="selectedSettlementTotal">¥0</div>
+                  </div>
+                  <div class="settlement-selection-box">
+                    <div class="settlement-label">1/2の額</div>
+                    <div class="settlement-selection-value" id="selectedSettlementHalf">¥0</div>
+                  </div>
+                </div>
+                <div class="inline-actions">
+                  <button id="selectAllUnpaidSettlementBtn" class="secondary-btn" type="button">
+                    未払いを全選択</button
+                  ><button id="clearSelectedSettlementBtn" class="secondary-btn" type="button">
+                    選択解除</button
+                  ><button id="settleSelectedSettlementBtn" class="primary-btn" type="button">
+                    選択項目を精算済みにする
+                  </button>
                 </div>
               </div>
               <div class="settlement-actions">
@@ -1126,16 +1197,16 @@
       </main>
       <button id="fab" class="fab hidden" type="button">＋</button>
       <nav id="bottomNav" class="bottom-nav hidden">
-        <button class="nav-btn active" data-screen="places" type="button">
-          <span class="nav-icon">📍</span><span>行きたい</span></button
-        ><button class="nav-btn" data-screen="plans" type="button">
-          <span class="nav-icon">🗂</span><span>ライフプラン</span></button
+        <button class="nav-btn active" data-screen="settlements" type="button">
+          <span class="nav-icon">💰</span><span>精算</span></button
         ><button class="nav-btn" data-screen="freezer" type="button">
           <span class="nav-icon">🧊</span><span>冷凍庫</span></button
         ><button class="nav-btn" data-screen="snacks" type="button">
           <span class="nav-icon">🍪</span><span>お菓子</span></button
-        ><button class="nav-btn" data-screen="settlements" type="button">
-          <span class="nav-icon">💰</span><span>精算</span>
+        ><button class="nav-btn" data-screen="places" type="button">
+          <span class="nav-icon">📍</span><span>行きたい</span></button
+        ><button class="nav-btn" data-screen="plans" type="button">
+          <span class="nav-icon">🗂</span><span>ライフプラン</span>
         </button>
       </nav>
     </div>
@@ -1240,13 +1311,14 @@
       const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       const state = {
         user: null,
-        currentScreen: "places",
+        currentScreen: "settlements",
         places: [],
         plans: [],
         freezerItems: [],
         snacks: [],
         settlements: [],
         settlementShowAll: false,
+        selectedSettlementIds: [],
         placeVisitFilter: "want",
         placeCategoryFilter: "all",
         planAgeFilter: "all",
@@ -1327,6 +1399,12 @@
         settlementSummaryAmount: $("settlementSummaryAmount"),
         settlementSummaryCount: $("settlementSummaryCount"),
         settlementSummaryTotal: $("settlementSummaryTotal"),
+        selectedSettlementCount: $("selectedSettlementCount"),
+        selectedSettlementTotal: $("selectedSettlementTotal"),
+        selectedSettlementHalf: $("selectedSettlementHalf"),
+        selectAllUnpaidSettlementBtn: $("selectAllUnpaidSettlementBtn"),
+        clearSelectedSettlementBtn: $("clearSelectedSettlementBtn"),
+        settleSelectedSettlementBtn: $("settleSelectedSettlementBtn"),
         settlementStatus: $("settlementStatus"),
         settlementListTitle: $("settlementListTitle"),
         settlementsList: $("settlementsList"),
@@ -1489,6 +1567,20 @@
           amount: Math.round(amount),
         };
       }
+      function calculateSelectedSettlements() {
+        const selected = state.settlements.filter(
+          (i) =>
+            i.status === "unpaid" &&
+            state.selectedSettlementIds.includes(String(i.id)),
+        );
+        const total = selected.reduce((sum, i) => sum + Number(i.amount || 0), 0);
+        return {
+          count: selected.length,
+          total,
+          half: Math.round(total / 2),
+        };
+      }
+
       function showLoggedOut() {
         state.user = null;
         state.places = [];
@@ -1496,6 +1588,7 @@
         state.freezerItems = [];
         state.snacks = [];
         state.settlements = [];
+        state.selectedSettlementIds = [];
         state.editingPlaceId = null;
         state.editingPlanId = null;
         state.editingFreezerId = null;
@@ -1519,7 +1612,7 @@
         els.accountDot.classList.add("logged-in");
         els.accountLabel.textContent = user.email || "ログイン中";
         els.accountEmail.textContent = `${user.email || ""}\nユーザーID: ${user.id || ""}`;
-        switchScreen("places");
+        switchScreen("settlements");
         renderAll();
       }
       function updatePlaceFilterTabs() {
@@ -1753,12 +1846,72 @@
               .join("")
           : `<div class="empty-state">お菓子はまだありません。</div>`;
       }
+      function renderSelectedSettlementSummary() {
+        const selected = calculateSelectedSettlements();
+        els.selectedSettlementCount.textContent = `${selected.count}件`;
+        els.selectedSettlementTotal.textContent = formatCurrency(selected.total);
+        els.selectedSettlementHalf.textContent = formatCurrency(selected.half);
+        els.settleSelectedSettlementBtn.disabled = selected.count === 0;
+      }
+      function toggleSettlementSelection(id, checked) {
+        const key = String(id);
+        if (checked) {
+          if (!state.selectedSettlementIds.includes(key))
+            state.selectedSettlementIds.push(key);
+        } else {
+          state.selectedSettlementIds = state.selectedSettlementIds.filter(
+            (v) => v !== key,
+          );
+        }
+        renderSettlements();
+      }
+      function selectAllUnpaidSettlements() {
+        state.selectedSettlementIds = state.settlements
+          .filter((i) => i.status === "unpaid")
+          .map((i) => String(i.id));
+        renderSettlements();
+      }
+      function clearSelectedSettlements() {
+        state.selectedSettlementIds = [];
+        renderSettlements();
+      }
+      async function settleSelectedPayments() {
+        const ids = state.settlements
+          .filter(
+            (i) =>
+              i.status === "unpaid" &&
+              state.selectedSettlementIds.includes(String(i.id)),
+          )
+          .map((i) => i.id);
+        if (!ids.length)
+          return setStatus(
+            els.settlementStatus,
+            "精算済みにする選択項目がありません。",
+            "warning",
+          );
+        const { error } = await supabase
+          .from("settlement_items")
+          .update({ status: "settled" })
+          .in("id", ids)
+          .eq("list_id", SHARED_LIST_ID);
+        if (error)
+          return setStatus(
+            els.settlementStatus,
+            `更新に失敗しました: ${error.message}`,
+            "error",
+          );
+        state.selectedSettlementIds = [];
+        await reloadAllData();
+        setStatus(els.settlementStatus, "選択項目を精算済みにしました。", "success");
+      }
+
       function renderSettlements() {
         const result = calculateSettlement();
         els.settlementSummaryDirection.textContent = result.direction;
         els.settlementSummaryAmount.textContent = formatCurrency(result.amount);
         els.settlementSummaryCount.textContent = `未払い ${result.unpaidCount}件`;
         els.settlementSummaryTotal.textContent = `未払い合計 ${formatCurrency(result.total)}`;
+        renderSelectedSettlementSummary();
         els.settlementShowUnpaidBtn.classList.toggle(
           "active",
           !state.settlementShowAll,
@@ -1782,7 +1935,7 @@
         els.settlementsList.innerHTML = rows
           .map(
             (i) =>
-              `<article class="card"><div class="payment-top"><div><div class="payment-date">${escapeHtml(formatDateJa(i.payment_date))}</div><h3 class="card-title">${escapeHtml(i.title)}</h3></div><div class="payment-amount">${escapeHtml(formatCurrency(i.amount))}</div></div><div class="pill-row"><span class="pill ${i.status === "settled" ? "status-pill-settled" : "status-pill-unpaid"}">${escapeHtml(paymentStatusLabel(i.status))}</span><span class="pill">支払った人: ${escapeHtml(payerLabel(i.paid_by))}</span></div><div class="card-actions">${i.status === "unpaid" ? `<button class="secondary-btn" type="button" data-settlement-settle="${escapeHtml(i.id)}">精算済みにする</button>` : ""}<button class="secondary-btn" type="button" data-settlement-edit="${escapeHtml(i.id)}">編集</button><button class="danger-btn" type="button" data-settlement-delete="${escapeHtml(i.id)}">削除</button></div></article>`,
+              `<article class="card"><div class="settlement-select-row">${i.status === "unpaid" ? `<input class="settlement-checkbox" type="checkbox" data-settlement-select="${escapeHtml(i.id)}" ${state.selectedSettlementIds.includes(String(i.id)) ? "checked" : ""} aria-label="${escapeHtml(i.title)}を選択">` : ""}<div class="settlement-card-main"><div class="payment-top"><div><div class="payment-date">${escapeHtml(formatDateJa(i.payment_date))}</div><h3 class="card-title">${escapeHtml(i.title)}</h3></div><div class="payment-amount">${escapeHtml(formatCurrency(i.amount))}</div></div><div class="pill-row"><span class="pill ${i.status === "settled" ? "status-pill-settled" : "status-pill-unpaid"}">${escapeHtml(paymentStatusLabel(i.status))}</span><span class="pill">支払った人: ${escapeHtml(payerLabel(i.paid_by))}</span></div><div class="card-actions">${i.status === "unpaid" ? `<button class="secondary-btn" type="button" data-settlement-settle="${escapeHtml(i.id)}">精算済みにする</button>` : ""}<button class="secondary-btn" type="button" data-settlement-edit="${escapeHtml(i.id)}">編集</button><button class="danger-btn" type="button" data-settlement-delete="${escapeHtml(i.id)}">削除</button></div></div></div></article>`,
           )
           .join("");
       }
@@ -1842,6 +1995,14 @@
           .order("created_at", { ascending: false });
         if (error) throw error;
         state.settlements = Array.isArray(data) ? data : [];
+        const validUnpaidIds = new Set(
+          state.settlements
+            .filter((i) => i.status === "unpaid")
+            .map((i) => String(i.id)),
+        );
+        state.selectedSettlementIds = state.selectedSettlementIds.filter((id) =>
+          validUnpaidIds.has(String(id)),
+        );
       }
       async function verifyMembership(user) {
         const { data, error } = await supabase
@@ -2351,6 +2512,7 @@
             `更新に失敗しました: ${error.message}`,
             "error",
           );
+        state.selectedSettlementIds = [];
         await reloadAllData();
         setStatus(
           els.settlementStatus,
@@ -2392,7 +2554,7 @@
         els.placeUrlInput.value = i.url || "";
         els.placeCategoryInput.value = i.category || "食";
         updateFormTitles();
-        switchScreen("places");
+        switchScreen("settlements");
         scrollTo({ top: 0, behavior: "smooth" });
         setStatus(els.placeStatus, "編集モードです。", "warning");
       }
@@ -2565,8 +2727,12 @@
         if (kind === "freezer" && state.editingFreezerId === id)
           resetFreezerForm();
         if (kind === "snack" && state.editingSnackId === id) resetSnackForm();
-        if (kind === "settlement" && state.editingSettlementId === id)
-          closeSettlementModal();
+        if (kind === "settlement") {
+          state.selectedSettlementIds = state.selectedSettlementIds.filter(
+            (v) => v !== String(id),
+          );
+          if (state.editingSettlementId === id) closeSettlementModal();
+        }
         await reloadAllData();
         setStatus(statusEl, "削除しました。", "success");
         closeDeleteModal();
@@ -2632,7 +2798,7 @@
         });
         els.openPlaceFormBtn.addEventListener("click", () => {
           closeFabModal();
-          switchScreen("places");
+          switchScreen("settlements");
           scrollTo({ top: 0, behavior: "smooth" });
           els.placeNameInput.focus();
         });
@@ -2695,6 +2861,9 @@
         els.settlementModal.addEventListener("click", (e) => {
           if (e.target === els.settlementModal) closeSettlementModal();
         });
+        els.selectAllUnpaidSettlementBtn.addEventListener("click", selectAllUnpaidSettlements);
+        els.clearSelectedSettlementBtn.addEventListener("click", clearSelectedSettlements);
+        els.settleSelectedSettlementBtn.addEventListener("click", settleSelectedPayments);
         els.settleAllSettlementBtn.addEventListener("click", settleAllPayments);
         els.deleteSettledSettlementBtn.addEventListener(
           "click",
@@ -2789,6 +2958,10 @@ els.plansList.addEventListener("click", async (e) => {
         els.settlementsList.addEventListener("click", async (e) => {
           const t = e.target;
           if (!(t instanceof HTMLElement)) return;
+          if (t instanceof HTMLInputElement && t.dataset.settlementSelect) {
+            toggleSettlementSelection(t.dataset.settlementSelect, t.checked);
+            return;
+          }
           if (t.dataset.settlementEdit)
             startSettlementEdit(t.dataset.settlementEdit);
           if (t.dataset.settlementDelete)
@@ -2811,7 +2984,7 @@ els.plansList.addEventListener("click", async (e) => {
       }
       async function init() {
         bindEvents();
-        switchScreen("places");
+        switchScreen("settlements");
         resetPlaceForm();
         resetPlanForm();
         resetFreezerForm();
