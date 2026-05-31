@@ -591,6 +591,9 @@
         display: grid;
         gap: 10px;
       }
+      .settlement-actions-top {
+        margin-bottom: 16px;
+      }
       .settlement-filters {
         display: flex;
         gap: 8px;
@@ -1110,6 +1113,11 @@
           <section id="screen-settlements" class="screen active">
             <section class="panel">
               <h2 class="section-title">精算メモ</h2>
+              <div class="settlement-actions settlement-actions-top">
+                <button id="addSettlementBtn" class="primary-btn" type="button">
+                  ＋ 支払いを追加
+                </button>
+              </div>
               <div class="settlement-summary">
                 <div class="settlement-label">現在の精算額</div>
                 <div
@@ -1148,16 +1156,12 @@
                   <button id="selectAllUnpaidSettlementBtn" class="secondary-btn" type="button">
                     未払いを全選択</button
                   ><button id="clearSelectedSettlementBtn" class="secondary-btn" type="button">
-                    選択解除</button
-                  ><button id="settleSelectedSettlementBtn" class="primary-btn" type="button">
-                    選択項目を精算済みにする
+                    選択解除
                   </button>
                 </div>
               </div>
               <div class="settlement-actions">
-                <button id="addSettlementBtn" class="primary-btn" type="button">
-                  ＋ 支払いを追加</button
-                ><button
+                <button
                   id="settleAllSettlementBtn"
                   class="secondary-btn"
                   type="button"
@@ -1303,6 +1307,19 @@
         </div>
       </div>
     </div>
+    <div id="confirmActionModal" class="modal-backdrop hidden">
+      <div class="modal-card">
+        <h3 class="modal-title" id="confirmActionTitle">確認</h3>
+        <p id="confirmActionText" class="modal-note">実行しますか？</p>
+        <div class="modal-actions">
+          <button id="confirmActionYesBtn" class="danger-btn" type="button">
+            はい</button
+          ><button id="confirmActionNoBtn" class="secondary-btn" type="button">
+            いいえ
+          </button>
+        </div>
+      </div>
+    </div>
     <script type="module">
       import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
       const SUPABASE_URL = "https://iivycgqxkxkwtjwstgpl.supabase.co";
@@ -1330,6 +1347,7 @@
         editingSnackId: null,
         editingSettlementId: null,
         deleteTarget: null,
+        confirmAction: null,
         pendingEmail: "",
       };
       const $ = (id) => document.getElementById(id);
@@ -1404,7 +1422,6 @@
         selectedSettlementHalf: $("selectedSettlementHalf"),
         selectAllUnpaidSettlementBtn: $("selectAllUnpaidSettlementBtn"),
         clearSelectedSettlementBtn: $("clearSelectedSettlementBtn"),
-        settleSelectedSettlementBtn: $("settleSelectedSettlementBtn"),
         settlementStatus: $("settlementStatus"),
         settlementListTitle: $("settlementListTitle"),
         settlementsList: $("settlementsList"),
@@ -1433,6 +1450,11 @@
         deleteModalText: $("deleteModalText"),
         confirmDeleteBtn: $("confirmDeleteBtn"),
         cancelDeleteBtn: $("cancelDeleteBtn"),
+        confirmActionModal: $("confirmActionModal"),
+        confirmActionTitle: $("confirmActionTitle"),
+        confirmActionText: $("confirmActionText"),
+        confirmActionYesBtn: $("confirmActionYesBtn"),
+        confirmActionNoBtn: $("confirmActionNoBtn"),
       };
       const screenEls = {
         places: $("screen-places"),
@@ -1851,7 +1873,6 @@
         els.selectedSettlementCount.textContent = `${selected.count}件`;
         els.selectedSettlementTotal.textContent = formatCurrency(selected.total);
         els.selectedSettlementHalf.textContent = formatCurrency(selected.half);
-        els.settleSelectedSettlementBtn.disabled = selected.count === 0;
       }
       function toggleSettlementSelection(id, checked) {
         const key = String(id);
@@ -2478,6 +2499,48 @@
         if (!item) return;
         openSettlementModal(item);
       }
+      function openConfirmActionModal(kind) {
+        if (kind === "settleAll") {
+          const unpaidCount = state.settlements.filter((i) => i.status === "unpaid").length;
+          if (!unpaidCount) {
+            setStatus(els.settlementStatus, "未払いはありません。", "warning");
+            return;
+          }
+          state.confirmAction = kind;
+          els.confirmActionTitle.textContent = "未払いを全件精算済みにしますか？";
+          els.confirmActionText.textContent = `未払い ${unpaidCount}件をすべて精算済みにします。この操作は後から個別に戻す必要があります。`;
+          els.confirmActionYesBtn.className = "danger-btn";
+          els.confirmActionModal.classList.remove("hidden");
+          return;
+        }
+        if (kind === "deleteSettled") {
+          const settledCount = state.settlements.filter((i) => i.status === "settled").length;
+          if (!settledCount) {
+            setStatus(els.settlementStatus, "削除できる精算済みデータはありません。", "warning");
+            return;
+          }
+          state.confirmAction = kind;
+          els.confirmActionTitle.textContent = "精算済みを一括削除しますか？";
+          els.confirmActionText.textContent = `精算済み ${settledCount}件を削除します。削除後は元に戻せません。`;
+          els.confirmActionYesBtn.className = "danger-btn";
+          els.confirmActionModal.classList.remove("hidden");
+        }
+      }
+      function closeConfirmActionModal() {
+        state.confirmAction = null;
+        els.confirmActionModal.classList.add("hidden");
+      }
+      async function confirmActionYes() {
+        const action = state.confirmAction;
+        closeConfirmActionModal();
+        if (action === "settleAll") {
+          await settleAllPayments();
+        }
+        if (action === "deleteSettled") {
+          await deleteSettledPayments();
+        }
+      }
+
       async function settlePayment(id) {
         const { error } = await supabase
           .from("settlement_items")
@@ -2863,11 +2926,10 @@
         });
         els.selectAllUnpaidSettlementBtn.addEventListener("click", selectAllUnpaidSettlements);
         els.clearSelectedSettlementBtn.addEventListener("click", clearSelectedSettlements);
-        els.settleSelectedSettlementBtn.addEventListener("click", settleSelectedPayments);
-        els.settleAllSettlementBtn.addEventListener("click", settleAllPayments);
+        els.settleAllSettlementBtn.addEventListener("click", () => openConfirmActionModal("settleAll"));
         els.deleteSettledSettlementBtn.addEventListener(
           "click",
-          deleteSettledPayments,
+          () => openConfirmActionModal("deleteSettled"),
         );
         els.settlementShowUnpaidBtn.addEventListener("click", () => {
           state.settlementShowAll = false;
@@ -2976,6 +3038,11 @@ els.plansList.addEventListener("click", async (e) => {
         els.cancelDeleteBtn.addEventListener("click", closeDeleteModal);
         els.deleteModal.addEventListener("click", (e) => {
           if (e.target === els.deleteModal) closeDeleteModal();
+        });
+        els.confirmActionYesBtn.addEventListener("click", confirmActionYes);
+        els.confirmActionNoBtn.addEventListener("click", closeConfirmActionModal);
+        els.confirmActionModal.addEventListener("click", (e) => {
+          if (e.target === els.confirmActionModal) closeConfirmActionModal();
         });
         supabase.auth.onAuthStateChange((_event, session) => {
           if (session?.user) handleSession();
